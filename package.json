@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "test": "jest --runInBand",
-    "lint": "node --check index.js && node --check agent/queryAgent.js && node --check utils/formatter.js && node --check utils/dateUtils.js && node --check scripts/verifyData.js"
+    "lint": "node --check index.js && node --check agent/queryAgent.js && node --check utils/formatter.js && node --check utils/dateUtils.js && node --check scripts/verifyData.js",
+    "benchmark": "node tests/benchmark.js",
+    "benchmark:verbose": "node tests/benchmark.js --verbose"
   },
   "keywords": [
     "cli",

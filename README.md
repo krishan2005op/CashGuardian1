@@ -1,18 +1,29 @@
 # CashGuardian CLI
 
-Talk to your business finances in plain English with grounded, benchmarked insights.
+Talk to your business finances in plain English.
 
 ## Overview
 
-CashGuardian is a Node.js CLI assistant for SME finance analysis. It answers natural-language questions on cash flow, overdue invoices, risk, anomalies, and forecasts using a locked local dataset plus optional AI narrative support.
+CashGuardian is a Node.js CLI assistant for SME finance analysis in the "Talk to Data" hackathon track. It converts natural-language finance questions into deterministic, data-grounded answers and optionally uses free-tier AI providers for narrative responses. The intended users are founders, operators, and analysts who need fast and trustworthy insights without complex BI workflows.
 
-## Features
+## Problem Statement
 
-- Deterministic financial calculations over benchmark-locked data files
-- Intent-based query routing for cash, invoices, risk, prediction, compare, and summary flows
-- AI provider abstraction (`gemini`, `groq`, `openrouter`) with safe fallback
-- Benchmark runner with latency reporting
-- Unit tests for services and query routing
+Many teams struggle to extract quick, accurate, and trustworthy answers from operational data. They face tool complexity, ambiguous terminology, time pressure, and low confidence in outputs. CashGuardian reduces this friction by focusing on:
+
+- Clarity: plain-language answers for non-experts
+- Trust: consistent metric definitions and transparent data grounding
+- Speed: near-instant responses through a lightweight CLI flow
+
+## Working Features
+
+- Deterministic cash, invoice, risk, anomaly, and forecast services
+- Intent-based query routing (`cash`, `overdue`, `risk`, `compare`, `summary`, `prediction`)
+- AI provider abstraction (`gemini`, `groq`, `openrouter`) with safe fallback handling
+- Prompt context injection using:
+  - locked operational dataset (`transactions`, `invoices`, `metrics`)
+  - external validation references (`externalValidation.json`)
+- Benchmark runner with per-case latency capture
+- Jest test suite for services + query routing
 
 ## Install and Run
 
@@ -23,27 +34,114 @@ npm test
 npm start
 ```
 
+## Configuration
+
+Required variables are listed in `.env.example`.
+
+Minimum for AI responses:
+
+- `AI_PROVIDER`
+- `AI_API_KEY`
+- `AI_MODEL`
+
+Optional for reminder email testing:
+
+- `EMAIL_HOST`
+- `EMAIL_PORT`
+- `EMAIL_USER`
+- `EMAIL_PASS`
+- `EMAIL_FROM`
+
 ## Tech Stack
 
-- Node.js
-- Jest
-- date-fns
-- Nodemailer
-- dotenv
-- Gemini / Groq / OpenRouter APIs
+- Runtime: Node.js
+- CLI: readline
+- AI: Gemini / Groq / OpenRouter
+- Date utilities: date-fns
+- Email: Nodemailer
+- Config: dotenv
+- Testing: Jest
 
-## Usage
-
-Examples:
+## Usage Examples
 
 - `What is my current cash balance?`
+- `Give me a cash flow summary`
 - `Show me all overdue invoices`
+- `Which clients are at risk of not paying?`
 - `What will my cash look like in 30 days?`
 - `Compare this month vs last month`
+- `Give me a weekly summary`
 
-For full documentation, architecture, methodology, benchmark numbers, and CLI reference, see:
+## Data Sources
 
-- [docs/README.md](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\README.md)
-- [docs/architecture.md](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\architecture.md)
-- [docs/methodology.md](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\methodology.md)
-- [docs/cli-usage.md](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\cli-usage.md)
+Runtime business calculations are performed only on locked local data files:
+
+- `data/transactions.json`
+- `data/invoices.json`
+- `data/metrics.json`
+
+AI narrative quality is additionally guided by:
+
+- `data/externalValidation.json`
+
+This means benchmark numbers come from benchmark-locked local data; external references provide realism context only.
+
+## Benchmark
+
+Benchmark definitions live in:
+
+- `BENCHMARK.md`
+- `tests/benchmark.js`
+
+Latest benchmark run snapshot (from local `benchmark-results.json`):
+
+- Cases executed: `13/13`
+- Errors: `0`
+- Average latency: `5.08ms`
+- P50 latency: `1ms`
+- P95 latency: `56ms`
+- Max latency: `56ms`
+
+| Benchmark | Category | Latency (ms) |
+|---|---|---:|
+| BM-01 | Cash Balance | 56 |
+| BM-02 | Cash Summary | 0 |
+| BM-03 | Expense Breakdown | 0 |
+| BM-04 | Overdue Invoices | 4 |
+| BM-05 | Client History | 0 |
+| BM-06 | Risk Report | 0 |
+| BM-07 | Single Client Risk | 1 |
+| BM-08 | 30-Day Forecast | 1 |
+| BM-09 | Cash Runout Risk | 0 |
+| BM-10 | Anomaly Detection | 1 |
+| BM-11 | Logistics Spike | 0 |
+| BM-12 | Month Comparison | 0 |
+| BM-13 | Weekly Summary | 1 |
+
+## Test Status
+
+- Jest suites: `8/8` passing
+- Total automated tests: `67` passing
+
+## Architecture, Methodology, and CLI Reference
+
+- [Project docs](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\README.md)
+- [Architecture](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\architecture.md)
+- [Methodology](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\methodology.md)
+- [CLI usage](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\docs\cli-usage.md)
+
+## Limitations
+
+- Some benchmark text claims differ from locked raw data; implementation prioritizes data source truth.
+- AI output quality still depends on provider behavior and credentials.
+- Email reminder flow requires valid SMTP app credentials for live verification.
+
+## Future Improvements
+
+- Add automated benchmark scoring (not just manual rubric fields)
+- Add structured JSON output mode for dashboard integration
+- Expand intent parsing with entity extraction for richer multi-client queries
+
+## License
+
+Apache 2.0. See `LICENSE`.
