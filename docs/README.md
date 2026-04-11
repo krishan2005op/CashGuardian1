@@ -153,6 +153,47 @@ Week 2026-W19 projected balance: ₹1,65,000
 
 CashGuardian uses the benchmark set in [BENCHMARK.md](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\BENCHMARK.md). The benchmark contains 13 ground-truth prompts. The current runner in [benchmark.js](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\tests\benchmark.js) computes a maximum of 53 points.
 
+### Latest benchmark run
+
+Source: [benchmark-results.json](C:\Users\sapan.nv\OneDrive\Desktop\natwest\CashGuardian\benchmark-results.json)
+
+- Cases executed: `13/13`
+- Errors: `0`
+- Average latency: `2ms`
+- P95 latency: `16ms`
+
+| Benchmark | Category | Latency (ms) |
+|---|---|---:|
+| BM-01 | Cash Balance | 16 |
+| BM-02 | Cash Summary | 0 |
+| BM-03 | Expense Breakdown | 0 |
+| BM-04 | Overdue Invoices | 6 |
+| BM-05 | Client History | 0 |
+| BM-06 | Risk Report | 0 |
+| BM-07 | Single Client Risk | 1 |
+| BM-08 | 30-Day Forecast | 1 |
+| BM-09 | Cash Runout Risk | 0 |
+| BM-10 | Anomaly Detection | 1 |
+| BM-11 | Logistics Spike | 0 |
+| BM-12 | Month Comparison | 0 |
+| BM-13 | Weekly Summary | 1 |
+
+## Test Status
+
+- Jest suites: `8/8` passing
+- Total automated test cases: `67` passing
+
+## Data Model Usage
+
+- Core financial logic uses only locked local files:
+  - `data/transactions.json`
+  - `data/invoices.json`
+  - `data/metrics.json`
+- AI prompt quality is additionally guided by:
+  - `data/externalValidation.json`
+
+This means benchmark numbers come from local benchmark-locked data, while external references are used as narrative grounding context only.
+
 ## Limitations
 
 - Some task-sheet benchmark claims differ slightly from the locked JSON data, so code is grounded in the dataset first
