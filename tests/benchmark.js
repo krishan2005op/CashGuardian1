@@ -13,7 +13,7 @@
  * Net balance: -12500 | Overdue: 4 invoices, ₹215500 | High risk: Sharma Retail
  *
  * Scoring is manual — open benchmark-results.json and check each response
- * against the required facts in BENCHMARK.md. Max total score: 55.
+ * against the required facts in BENCHMARK.md. Max total score: 53.
  */
 
 "use strict";
@@ -210,7 +210,7 @@ const BENCHMARKS = [
   },
 ];
 
-const TOTAL_MAX = BENCHMARKS.reduce((s, b) => s + b.maxScore, 0); // 55
+const TOTAL_MAX = BENCHMARKS.reduce((s, b) => s + b.maxScore, 0); // 53
 
 // ── Runner ──────────────────────────────────────────────────────────────────
 
