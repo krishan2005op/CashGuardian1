@@ -244,7 +244,7 @@ Before submitting GitHub URL:
 - Add structured JSON output mode for dashboard integration
 - Expand intent parsing with entity extraction for richer multi-client queries
 
-## 🚀 Deployment (Vercel)
+##  Deployment (Vercel)
 
 CashGuardian is pre-configured for one-click deployment to **Vercel**.
 
