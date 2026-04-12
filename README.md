@@ -219,6 +219,20 @@ Before submitting GitHub URL:
 - Add structured JSON output mode for dashboard integration
 - Expand intent parsing with entity extraction for richer multi-client queries
 
-## License
+## 🚀 Deployment (Vercel)
+
+CashGuardian is pre-configured for one-click deployment to **Vercel**.
+
+1.  **Push to GitHub**: Ensure all changes are pushed to your repository.
+2.  **Import to Vercel**: Connect your GitHub repo to Vercel.
+3.  **Environment Variables**: In the Vercel Dashboard, add your `.env` variables:
+    - `AI_PROVIDER` (e.g., `gemini`)
+    - `AI_API_KEY` (Your key)
+    - `AI_MODEL` (e.g., `gemini-1.5-flash`)
+4.  **Deploy**: Vercel will automatically detect `vercel.json` and serve the platform.
+
+---
+
+## 🏛️ License
 
 Apache 2.0. See `LICENSE`.
