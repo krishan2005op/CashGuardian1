@@ -26,11 +26,18 @@ const { extractClientName, getSnapshot, buildSystemPrompt } = require("./queryAg
 
 // Initialize LLM based on provider
 function getLLM() {
-  const provider = process.env.AI_PROVIDER || "gemini";
+  const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase();
+  const apiKey = process.env.AI_API_KEY;
+  const model = process.env.AI_MODEL;
+
+  if (!apiKey) {
+    throw new Error("AI_API_KEY is not defined in environment variables.");
+  }
+
   if (provider === "gemini") {
     return new ChatGoogleGenerativeAI({
-      modelName: process.env.AI_MODEL || "gemini-1.5-flash",
-      apiKey: process.env.AI_API_KEY,
+      model: model || "gemini-1.5-flash",
+      apiKey: apiKey,
       maxOutputTokens: 500,
       temperature: 0.3
     });
@@ -42,8 +49,8 @@ function getLLM() {
     : "https://openrouter.ai/api/v1";
 
   return new ChatOpenAI({
-    modelName: process.env.AI_MODEL,
-    openAIApiKey: process.env.AI_API_KEY,
+    model: model,
+    apiKey: apiKey,
     configuration: {
       baseURL: baseUrl
     },
