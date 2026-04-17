@@ -251,15 +251,17 @@ async function run() {
     const ms = Date.now() - t0;
     console.log(`${error ? "❌" : "✅"} ${ms}ms`);
 
-    if (verbose && response) {
-      console.log(`   Preview: ${response.slice(0, 120).replace(/\n/g, " ")}…`);
+    const finalResponseText = (typeof response === 'object' && response !== null) ? response.content : response;
+
+    if (verbose && finalResponseText) {
+      console.log(`   Preview: ${finalResponseText.slice(0, 120).replace(/\n/g, " ")}…`);
     }
 
     results.push({
       id:            bm.id,
       category:      bm.category,
       input:         bm.input,
-      response:      response || "",
+      response:      finalResponseText || "",
       latencyMs:     ms,
       maxScore:      bm.maxScore,
       requiredFacts: bm.requiredFacts,

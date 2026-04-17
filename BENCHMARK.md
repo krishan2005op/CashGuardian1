@@ -279,20 +279,20 @@ Fill in after running all benchmarks:
 
 | ID | Category | Max | Your Score | Pass? |
 |---|---|---|---|---|
-| BM-01 | Cash Balance | 3 | | |
-| BM-02 | Cash Summary | 4 | | |
-| BM-03 | Expense Breakdown | 4 | | |
-| BM-04 | Overdue Invoices | 6 | | |
-| BM-05 | Client History | 4 | | |
-| BM-06 | Risk Report | 4 | | |
-| BM-07 | Single Client | 4 | | |
-| BM-08 | 30-Day Forecast | 4 | | |
-| BM-09 | Cash Runout | 4 | | |
-| BM-10 | Anomaly Detection | 4 | | |
-| BM-11 | Logistics Spike | 4 | | |
-| BM-12 | Month Comparison | 4 | | |
-| BM-13 | Weekly Summary | 4 | | |
-| | **TOTAL** | **55** | | |
+| BM-01 | Cash Balance | 3 | 3 | ✅ |
+| BM-02 | Cash Summary | 4 | 4 | ✅ |
+| BM-03 | Expense Breakdown | 4 | 3 | 🟡 |
+| BM-04 | Overdue Invoices | 6 | 6 | ✅ |
+| BM-05 | Client History | 4 | 1 | 🔴 |
+| BM-06 | Risk Report | 4 | 4 | ✅ |
+| BM-07 | Single Client | 4 | 4 | ✅ |
+| BM-08 | 30-Day Forecast | 4 | 1 | 🔴 |
+| BM-09 | Cash Runout | 4 | 4 | ✅ |
+| BM-10 | Anomaly Detection | 4 | 2 | 🟡 |
+| BM-11 | Logistics Spike | 4 | 0 | 🔴 |
+| BM-12 | Month Comparison | 4 | 4 | ✅ |
+| BM-13 | Weekly Summary | 4 | 4 | ✅ |
+| | **TOTAL** | **55** | **40** | **GOOD** |
 
 ### Grade scale
 

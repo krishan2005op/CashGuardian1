@@ -36,12 +36,13 @@ We monitor the time taken by the **Deterministic Services** (the math) vs the **
 
 ## 📈 Performance Snapshot
 
-| ID | Name | Category | Logic Latency | Result |
-|---|---|---|---|---|
-| BM-01 | Cash Balance | Cash | 1ms | ✅ PASS |
-| BM-06 | Risk Report | Risk | 1ms | ✅ PASS |
-| BM-08 | 30-Day Forecast | Forecast | 2ms | ✅ PASS |
-| BM-10 | Anomaly Detect | Anomaly | 1ms | ✅ PASS |
+| ID | Name | Category | Service Latency | Total Latency | Result |
+|---|---|---|---|---|---|
+| BM-01 | Cash Balance | Cash | 1ms | 627ms | ✅ PASS |
+| BM-04 | Overdue List | Invoices | 1ms | 1025ms | ✅ PASS |
+| BM-06 | Risk Report | Risk | 1ms | 1144ms | ✅ PASS |
+| BM-12 | Comparison | Summary | 2ms | 1602ms | ✅ PASS |
+| BM-13 | Weekly Summary| Summary | 2ms | 1984ms | ✅ PASS |
 
 ---
 
