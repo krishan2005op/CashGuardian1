@@ -150,6 +150,37 @@ function fallbackResponse() {
 }
 
 /**
+ * Clean numeric strings (removes ₹, commas, etc and handles NaN)
+ */
+function safeNumber(val) {
+  if (typeof val === 'number') return val;
+  if (!val) return 0;
+  const clean = val.toString().replace(/[₹$,\s]/g, '');
+  const num = parseFloat(clean);
+  return isNaN(num) ? 0 : num;
+}
+
+/**
+ * Robust date parser for common Excel/CSV formats (DD-MM-YYYY, ISO, etc)
+ */
+function safeDate(val) {
+  if (val instanceof Date) return val;
+  if (!val) return new Date();
+  
+  // Try mapping DD-MM-YYYY or DD/MM/YYYY to ISO if needed
+  if (typeof val === 'string' && (val.includes('-') || val.includes('/'))) {
+    const parts = val.split(/[-/]/);
+    if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) {
+      // Assuming DD-MM-YYYY
+      return new Date(Date.UTC(parts[2], parts[1] - 1, parts[0]));
+    }
+  }
+  
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
+/**
  * Helper to group transactions into weekly buckets for the trend graph.
  * @param {Array<Object>} transactions - List of transaction objects.
  * @param {number} weekOffset - Number of weeks to shift back (0 for current, 13 for previous).
@@ -159,7 +190,7 @@ function calculateWeeklyTrend(transactions, weekOffset = 0) {
   if (!transactions.length) return { labels: [], revenue: [], expenses: [] };
 
   // 1. Find the latest relative point
-  const dates = transactions.map(t => new Date(t.date));
+  const dates = transactions.map(t => safeDate(t.date));
   const absoluteLatest = new Date(Math.max(...dates));
   const weekMs = 7 * 24 * 60 * 60 * 1000;
   const offsetMs = weekOffset * weekMs;
@@ -178,12 +209,12 @@ function calculateWeeklyTrend(transactions, weekOffset = 0) {
     trend.labels.push(`W${weekNum}`);
 
     const weekTransactions = transactions.filter(t => {
-      const d = new Date(t.date);
+      const d = safeDate(t.date);
       return d > weekStart && d <= weekEnd;
     });
 
-    const income = weekTransactions.filter(t => t.type === 'income').reduce((s, t) => s + (Number(t.amount) || 0), 0);
-    const expense = weekTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Math.abs(Number(t.amount) || 0), 0);
+    const income = weekTransactions.filter(t => t.type === 'income').reduce((s, t) => s + safeNumber(t.amount), 0);
+    const expense = weekTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Math.abs(safeNumber(t.amount)), 0);
 
     trend.revenue.push(income);
     trend.expenses.push(expense);
@@ -202,38 +233,46 @@ function getSnapshot(customDataset = null) {
 
   // If we have a custom dataset, derive snapshot from it
   if (customDataset && customDataset.length > 0) {
-    const totalIncome = customDataset
-      .filter(item => item.amount > 0)
-      .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const totalExpenses = customDataset
-      .filter(item => item.amount < 0)
-      .reduce((sum, item) => sum + Math.abs(Number(item.amount) || 0), 0);
+    // PRE-CLEAN: Ensure all metrics downstream use clean numbers/dates
+    const cleanedData = customDataset.map(item => ({
+      ...item,
+      amount: safeNumber(item.amount),
+      date: safeDate(item.date)
+    }));
+
+    const totalIncome = cleanedData
+      .filter(item => item.type === 'income' || (!item.type && item.amount > 0))
+      .reduce((sum, item) => sum + item.amount, 0);
+    const totalExpenses = cleanedData
+      .filter(item => item.type === 'expense' || (!item.type && item.amount < 0))
+      .reduce((sum, item) => sum + Math.abs(item.amount), 0);
     
+
     // Breakdown for Donut Chart
-    const breakdownMap = customDataset
+    const breakdownMap = cleanedData
       .filter(item => item.type === 'expense')
       .reduce((acc, item) => {
-        acc[item.category] = (acc[item.category] || 0) + Math.abs(Number(item.amount) || 0);
+        acc[item.category] = (acc[item.category] || 0) + Math.abs(item.amount);
         return acc;
       }, {});
     
     const breakdown = Object.entries(breakdownMap).map(([category, total]) => ({ category, total }));
 
     // --- ENHANCED INTEL FOR CUSTOM DATA ---
-    const latestDate = getLatestTransactionDate(customDataset);
+    const latestDate = getLatestTransactionDate(cleanedData);
     const midPoint = new Date(latestDate);
     midPoint.setUTCDate(midPoint.getUTCDate() - 30);
     const startPoint = new Date(midPoint);
     startPoint.setUTCDate(startPoint.getUTCDate() - 30);
 
-    const currentInterval = getTransactionsInRange(midPoint, latestDate, customDataset);
-    const prevInterval = getTransactionsInRange(startPoint, midPoint, customDataset);
+    const currentInterval = getTransactionsInRange(midPoint, latestDate, cleanedData);
+    const prevInterval = getTransactionsInRange(startPoint, midPoint, cleanedData);
     const variances = getCategoryVariances(currentInterval, prevInterval);
 
-    const overdueClients = customDataset
+    const overdueClients = cleanedData
       .filter(item => item.status === 'overdue' && item.client && item.client !== 'Walk-in Client')
       .reduce((acc, item) => {
-        acc[item.client] = (acc[item.client] || 0) + (Number(item.amount) || 0);
+        acc[item.client] = (acc[item.client] || 0) + item.amount;
         return acc;
       }, {});
     
@@ -246,13 +285,13 @@ function getSnapshot(customDataset = null) {
       netBalance: totalIncome - totalExpenses,
       totalIncome,
       totalExpenses,
-      overdueCount: customDataset.filter(item => item.status === 'overdue').length,
-      overdueTotal: customDataset.filter(item => item.status === 'overdue').reduce((sum, item) => sum + (Number(item.amount) || 0), 0),
+      overdueCount: cleanedData.filter(item => item.status === 'overdue').length,
+      overdueTotal: cleanedData.filter(item => item.status === 'overdue').reduce((sum, item) => sum + item.amount, 0),
       highRiskClients: highRiskClients.length > 0 ? highRiskClients : ['None'],
       topExpenseCategory: breakdown.length > 0 ? breakdown.sort((a,b) => b.total - a.total)[0].category : 'Various',
       externalValidationNotes: ['Custom dataset active. Analysis based on user-provided transactional boundaries.'],
-      trend: calculateWeeklyTrend(customDataset, 0),
-      comparisonTrend: calculateWeeklyTrend(customDataset, 13),
+      trend: calculateWeeklyTrend(cleanedData, 0),
+      comparisonTrend: calculateWeeklyTrend(cleanedData, 13),
       breakdown,
       variances
     };
