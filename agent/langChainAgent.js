@@ -38,7 +38,7 @@ function getLLM() {
     return new ChatGoogleGenerativeAI({
       model: model || "gemini-1.5-flash",
       apiKey: apiKey,
-      maxOutputTokens: 500,
+      maxOutputTokens: 2000, // Increased for deeper reasoning
       temperature: 0.3
     });
   }
@@ -54,7 +54,7 @@ function getLLM() {
     configuration: {
       baseURL: baseUrl
     },
-    maxTokens: 500,
+    maxTokens: 2000, // Increased for 70B reasoning
     temperature: 0.3
   });
 }
@@ -125,7 +125,8 @@ async function executeNode(state) {
   // 3. Fallback to AI Reasoning (Passing history for conversational awareness)
   const snapshot = getSnapshot(activeDataset);
   const systemPrompt = buildSystemPrompt(snapshot) + 
-    (lastClient ? `\n\nCONTEXT: You are currently discussing "${lastClient}". If the user uses pronouns like "him", "them", or "that client", they refer to "${lastClient}".` : "");
+    (lastClient ? `\n\nCONTEXT: You are currently discussing "${lastClient}". If the user uses pronouns like "him", "them", or "that client", they refer to "${lastClient}".` : "") +
+    `\n\nREPORT QUALITY RULE: You are currently using a high-reasoning 70B model. Provide at least 3-4 detailed paragraphs of analysis. Avoid short answers. Deep-dive into the "Why" behind the numbers.`;
 
   const llm = getLLM();
   const response = await llm.invoke([
