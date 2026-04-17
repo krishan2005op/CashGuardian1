@@ -281,6 +281,14 @@
         let awaitingPdfConfirm = false;
         let chatHistory = []; // Conversational memory
 
+        function formatCurrency(val) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(val);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initCharts();
             fetchSnapshot();
@@ -405,11 +413,49 @@
 
         function updateDuelChart(duel) {
             const { entityA, entityB } = duel;
-            duelChart.data.labels = ['Revenue', 'Growth', 'Volume'];
+            
+            // Normalize data for visualization (0-100 scaling)
+            // This prevents ₹85,000 Revenue from making 8% Growth invisible
+            const maxRev = Math.max(entityA.revenue, entityB.revenue) || 1;
+            const maxGrowth = Math.max(Math.abs(entityA.growth), Math.abs(entityB.growth), 1);
+            const maxVol = Math.max(entityA.volume, entityB.volume) || 1;
+
+            duelChart.data.labels = ['Revenue %', 'Growth %', 'Volume %'];
             duelChart.data.datasets = [
-                { label: entityA.name, backgroundColor: '#C17E4A', data: [entityA.revenue, entityA.growth, entityA.volume] },
-                { label: entityB.name, backgroundColor: '#E6A495', data: [entityB.revenue, entityB.growth, entityB.volume] }
+                { 
+                    label: entityA.name, 
+                    backgroundColor: '#C17E4A', 
+                    data: [
+                        (entityA.revenue / maxRev) * 100,
+                        (entityA.growth / maxGrowth) * 100,
+                        (entityA.volume / maxVol) * 100
+                    ],
+                    // Store raw values for tooltips
+                    raw: [formatCurrency(entityA.revenue), `${entityA.growth}%`, entityA.volume]
+                },
+                { 
+                    label: entityB.name, 
+                    backgroundColor: '#E6A495', 
+                    data: [
+                        (entityB.revenue / maxRev) * 100,
+                        (entityB.growth / maxGrowth) * 100,
+                        (entityB.volume / maxVol) * 100
+                    ],
+                    // Store raw values for tooltips
+                    raw: [formatCurrency(entityB.revenue), `${entityB.growth}%`, entityB.volume]
+                }
             ];
+
+            // Custom tooltip to show real numbers
+            duelChart.options.plugins.tooltip = {
+                callbacks: {
+                    label: function(context) {
+                        const rawVal = context.dataset.raw[context.dataIndex];
+                        return `${context.dataset.label}: ${rawVal}`;
+                    }
+                }
+            };
+
             duelChart.update();
         }
 
