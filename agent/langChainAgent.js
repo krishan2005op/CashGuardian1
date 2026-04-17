@@ -162,7 +162,7 @@ async function executeNode(state) {
     const resultAI = await llm.invoke([new SystemMessage(systemPrompt), ...messages]);
 
     return {
-      response: `${resultAI.content}\n\n${table}`,
+      response: `${resultAI.content.trim()}\n${table}`,
       duel: null
     };
   }
