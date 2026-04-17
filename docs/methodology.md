@@ -16,10 +16,34 @@ Intent matching is:
 ```mermaid
 flowchart TD
     A[User Input] --> B[intentMap.js]
-    B -->|keyword match| C[Service Layer]
-    B -->|UNKNOWN| D[AI Provider]
-    C --> E[Formatted Response]
+    B -->|keyword match| C[Deterministic Service]
+    B -->|UNKNOWN| D[Agentic Reasoning Engine]
+    C --> E[Final Response]
     D --> E
+    
+    subgraph Engine
+      D --> AI[AI Provider]
+    end
+```
+
+---
+
+## Excel-Proof Data Ingestion
+
+CashGuardian features a robust sanitization layer designed to handle the "dirty" data typically found in manual Excel exports or localized SME ledgers.
+
+### Sanitization Workflow:
+1. **Currency Normalization**: Strips ₹, $, commas, and whitespace before casting to absolute numbers.
+2. **Robust Date Parsing**: Automatically detects and converts `DD-MM-YYYY`, `DD/MM/YYYY`, and partial ISO formats into standardized UTC dates.
+3. **Implicit Classification**: If a transaction `type` is missing, the engine infers `income` vs `expense` based on numeric sign (positive/negative).
+
+```mermaid
+flowchart LR
+    CSV[Raw CSV/Excel] --> S[safeNumber]
+    CSV --> D[safeDate]
+    S --> V[Verified Dataset]
+    D --> V
+    V --> G[Grounded Analysis]
 ```
 
 ---
@@ -114,34 +138,23 @@ This is not a full forecasting model — it is a transparent projection that any
 
 ## Context Injection
 
-When AI is used, CashGuardian injects a live financial snapshot into the system prompt rather than asking the model to infer numbers from scratch.
+1. **Identity Block**: Defines the persona as **CashGuardian AI**, professional and data-anchored.
+2. **Live Data Block (Primary)**: Injects the **Grounded Snapshot** (Net balance, Income/Expenses, Top Category).
+3. **Overdue Invoices Block**: Injects a detailed `overdueList` with specific client names, amounts, and dates to prevent identification hallucinations.
+4. **Variance Drivers Block**: Injects categorical MoM changes (e.g., "Marketing +107%") allowing the AI to answer "Why?" questions accurately.
+5. **External Validation Block**: Injects industry baselines from World Bank/IBM/UCI.
 
 ```mermaid
 flowchart TD
-    Q[User Query] --> SVC[Service Calls]
-    SVC --> SNAP[Metric Snapshot]
-    SNAP --> P[System Prompt]
-    P --> DATA[Live financial stats]
-    P --> VAL[External validation context]
-    DATA & VAL --> AI[AI Provider]
-    AI --> RESP[Narrative Response]
+    Q[User Query] --> SVC[Service Calculation]
+    SVC --> SNAP[Grounded Snapshot]
+    SNAP --> P[Prompt Orchestrator]
+    P --> OB[Overdue List]
+    P --> VB[Variance Drivers]
+    P --> EB[External Validation]
+    OB & VB & EB --> AI[AI Engine]
+    AI --> RESP[Executive Narrative]
 ```
-
-The snapshot includes:
-- cash balance
-- total income and expenses
-- overdue invoice totals
-- high-risk clients
-- top expense category
-
-This approach was chosen over fine-tuning because it keeps answers deterministic and auditable — every number in the AI response traces back to a specific line in the local JSON files. The AI explains the numbers; it does not produce them.
-
-CashGuardian also injects external validation notes from `data/externalValidation.json`:
-- IBM Finance Factoring insights for late-payment realism
-- UCI Online Retail II insights for sales-band realism
-- World Bank MSME insights for cost-structure realism
-
-These references do not replace the local financial dataset. They only provide grounded context for narrative quality.
 
 ---
 

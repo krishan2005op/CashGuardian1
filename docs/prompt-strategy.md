@@ -31,10 +31,16 @@ The system prompt is dynamically assembled for every query. It consists of four 
 Defines the persona as **CashGuardian AI**, a professional finance assistant for Indian SMEs.
 
 ### 2. Live Data Block (Primary Grounding)
-The most critical block. It contains the exact numbers pulled from the `Services` layer (Net balance, overdue count, etc.). If a custom dataset is uploaded, a **sampling of rows** is also injected to give the AI a "feel" for the data structure.
+The most critical block. It contains the exact numbers pulled from the `Services` layer (Net balance, Income/Expenses, Top Category).
 
-### 3. External Validation Block
-Injects reference data from `data/externalValidation.json`. This provides industrybaselines (e.g., typical logistics costs) to help the AI identify if a company's spending is "normal" or "anomalous" compared to peers.
+### 3. Detailed Overdue Block
+Injects an explicit list of overdue invoices (Client, Amount, Due Date). This ensures the AI can accurately identify debtors without hallucinating names.
+
+### 4. Categorical Variance Block (Deltas)
+Injects MoM changes for every category (e.g., "Logistics changed by -78%"). This gives the AI the "Why?" context needed for deep analysis.
+
+### 5. External Validation Block
+Injects reference data from `data/externalValidation.json` (IBM, World Bank, UCI industry baselines).
 
 ### 4. Constraint Block
 Hard constraints on what the AI can and cannot say:

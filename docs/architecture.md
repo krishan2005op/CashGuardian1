@@ -98,6 +98,7 @@ A minimalist Express server that serves the `web/` static files and provides API
 - `/api/upload`: In-memory ingestion of CSV/JSON files.
 - `/api/query`: Logic-agnostic interface for the Web UI.
 - `/api/snapshot`: Real-time metric gathering for the "Dataset Overview" panel.
+- **Excel-Robust Ingestion**: Middleware that sanitizes currency, formats dates, and infers transaction types from raw CSV/Excel streams.
 
 ### 2. `agent/queryAgent.js` (Intelligence Core)
 The primary orchestrator. It is responsible for:
@@ -110,9 +111,12 @@ Uses high-performance keyword mapping to determine if a query is deterministic (
 
 ### 4. Services Layer (`services/`)
 A suite of immutable logic modules that perform calculations on the data.
-- **`cashFlowService.js`**: Ledger aggregation and trends.
-- **`invoiceService.js`**: Status tracking and aging analysis.
-- **`riskService.js`**: Customer reliability scoring.
+- **`cashFlowService.js`**: Ledger aggregation and variance analysis.
+- **`invoiceService.js`**: Status tracking and overdue aging analysis.
+- **`riskService.js`**: Customer reliability scoring using late-payment signals.
+- **`predictionService.js`**: 30-day cash projection logic.
+- **`anomalyService.js`**: Baseline-deviation detection for spikes and drops.
+- **`summaryService.js`**: Periodic (weekly/monthly) performance narratives.
 
 ---
 

@@ -44,11 +44,18 @@ graph LR
 ### 1. Uploading Data
 You can upload any **CSV** or **JSON** file containing financial transactions or invoices. 
 1. Click **"Upload CSV/JSON"** in the sidebar.
-2. Once processed, the **Dataset Overview** panel will automatically update with the new numbers.
-3. The AI is now grounded in **your data**.
+2. The **Excel-Robust Ingestion Engine** automatically cleanses data (stripping ₹ symbols/commas and standardizing date formats).
+3. Once processed, the **Dataset Overview** panel will automatically update.
 
-### 2. Intelligent Inference
-When a custom dataset is uploaded, CashGuardian scans the first few rows to understand the "Schema" (column names). It then uses this context to answer questions about specific columns (e.g., "What was the total for the 'Gross Amount' column?").
+### 2. Comparison Duels
+For head-to-head analysis, use the "Duel" feature by asking: *"Compare Logistics versus Marketing"* or *"Compare Sharma Retail vs Patel Distributors"*.
+- The UI renders a side-by-side performance breakdown.
+- Context is automatically injected to highlight the growth/volume delta between the two entities.
+
+### 3. Executive PDF Dossiers
+Need a portable report for stakeholders?
+1. Click the **"Export PDF"** button (top right of the sidebar).
+2. The system generates a high-fidelity PDF containing your current balance, the 13-week trend chart, and a grounded AI narrative of your financial health.
 
 ---
 

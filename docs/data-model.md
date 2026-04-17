@@ -201,6 +201,18 @@ The synthetic approach lets us **design for all features** while still being **g
 
 ---
 
+## Dynamic Schema Intelligence (In-Memory)
+
+When a user uploads a custom dataset in the Web UI, CashGuardian uses a **Flexible In-memory Schema** to handle the data without a database.
+
+### Ingestion Logic:
+- **Zero-Latency Persistence**: Data is kept in the server's `activeDataset` variable (RAM).
+- **Attribute Mapping**: The engine automatically identifies columns like `amount`, `date`, `client`, and `category` regardless of capitalization or extra whitespace.
+- **Excel-Robust Sanitization**: Any currency symbols or non-ISO date strings are cleansed in real-time before being injected into the grounding prompt.
+- **Sampling Injection**: For very large datasets, the engine injects a sampling of the first 10 rows into the AI context to give the model a specific "mental map" of the user's data structure.
+
+---
+
 ## Schema rules (enforced by AGENTS.md)
 
 1. Never modify these files — they are benchmark-locked

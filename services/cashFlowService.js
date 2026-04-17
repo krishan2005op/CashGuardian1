@@ -15,8 +15,9 @@ function parseUtcDate(dateStr) {
  * @returns {Date} Latest transaction date.
  */
 function getLatestTransactionDate(dataset = transactions) {
-  if (!dataset || dataset.length === 0) return new Date();
-  return dataset.reduce((latest, transaction) => {
+  const data = dataset || transactions;
+  if (!data || data.length === 0) return new Date();
+  return data.reduce((latest, transaction) => {
     const transactionDate = parseUtcDate(transaction.date);
     return transactionDate > latest ? transactionDate : latest;
   }, parseUtcDate(dataset[0].date));
@@ -30,7 +31,8 @@ function getLatestTransactionDate(dataset = transactions) {
  * @returns {Array<object>} Filtered transactions.
  */
 function getTransactionsInRange(from, to, dataset = transactions) {
-  return dataset.filter((transaction) => {
+  const data = dataset || transactions;
+  return data.filter((transaction) => {
     const transactionDate = parseUtcDate(transaction.date);
     return transactionDate >= from && transactionDate <= to;
   });
@@ -206,8 +208,9 @@ function summarizeByCategory(items) {
  * @returns {object} Aggregated metrics.
  */
 function summarizeEntityMetrics(entity, dataset = transactions) {
+  const data = dataset || transactions;
   const norm = entity.toLowerCase();
-  const matches = dataset.filter(t => 
+  const matches = data.filter(t => 
     (t.client && t.client.toLowerCase().includes(norm)) ||
     (t.category && t.category.toLowerCase().includes(norm)) ||
     (t.description && t.description.toLowerCase().includes(norm))
@@ -218,7 +221,7 @@ function summarizeEntityMetrics(entity, dataset = transactions) {
   const volume = matches.length;
   
   // Growth WoW (Last 7 days vs 7 days before)
-  const latest = getLatestTransactionDate(dataset);
+  const latest = getLatestTransactionDate(data);
   const cStart = new Date(latest); cStart.setUTCDate(cStart.getUTCDate() - 6);
   const pEnd = new Date(cStart); pEnd.setUTCDate(pEnd.getUTCDate() - 1);
   const pStart = new Date(pEnd); pStart.setUTCDate(pStart.getUTCDate() - 6);

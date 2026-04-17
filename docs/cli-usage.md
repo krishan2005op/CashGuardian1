@@ -1,14 +1,9 @@
-# CLI Usage Reference
-
-## Commands
-
-### 1. Current balance
-
 ```text
 > What is my current cash balance?
-Current net cash balance is −₹12,500.
-Income: ₹9,25,500 | Expenses: ₹9,38,000
-Recommendation: prioritise overdue collections immediately.
+#### Current Cash Balance
+Your current net cash balance is ₹-12,500, indicating a deficit.
+Strategic Implication: This suggests a liquidity crunch impacting immediate obligations.
+Strategic Next Step: Focus on collecting ₹2,15,500 in overdue invoices.
 ```
 
 ### 2. Cash flow summary
@@ -81,15 +76,14 @@ outflow of ₹23,000. Compared with the previous week, the net position has impr
 Recent anomalies include sales in 2026-W10 (64%) and logistics in 2026-W08 (72%).
 ```
 
-### 9. Period comparison
+### 10. Comparison Duel
 
 ```text
-> Compare this month vs last month
-Current period:  2026-04-01 to 2026-04-10
-Previous period: 2026-03-01 to 2026-03-31
-Income delta:   −₹3,14,000
-Expense delta:  −₹3,34,500
-Net improvement: ₹20,500
+> Compare Sharma Retail versus Patel Distributors
+#### Executive Comparison: Sharma Retail vs Patel Distributors
+- Sharma Retail: HIGH risk, ₹96,000 overdue, 3/4 invoices late.
+- Patel Distributors: MEDIUM risk, ₹38,500 overdue, 1/3 invoices late.
+Strategic Narrative: While both are significant accounts, Sharma Retail represents the primary risk vector for your 30-day liquidity.
 ```
 
 ### 10. Send reminder

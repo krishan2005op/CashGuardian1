@@ -29,9 +29,9 @@ Talk to your business finances in plain English — via natural language, ground
 
 ---
 
-CashGuardian is a full-stack "Talk to Data" assistant built for the hackathon. It converts natural-language finance questions into deterministic, data-grounded answers using an **Agentic Reasoning Engine**. It runs as both an interactive CLI and a professional web interface.
+CashGuardian is a full-stack **Talk to Data** platform built for the hackathon. It converts natural-language finance questions into deterministic, data-grounded answers using a state-aware **Agentic Reasoning Engine**. It runs as both a reactive CLI and a professional, glassmorphism web interface.
 
-The platform is designed for founders, operators, and analysts who need fast, trustworthy insights and professional executive reporting without complex BI workflows.
+The platform is designed for founders, operators, and analysts who need fast, trustworthy insights and **Executive PDF Reporting** without complex BI overhead.
 
 ---
 
@@ -139,10 +139,10 @@ sequenceDiagram
 
 ---
 
-- **Agentic Reasoning**: State-aware orchestration for complex financial pivots (Variance, Comparsion, Risk).
-- **Excel-Proof Ingestion**: Robust handling of localized CSV/Excel data (₹ symbols, commas, Indian dates).
-- **Executive PDF Dossiers**: Professional report generation with visual data appendix.
-- **Performance Duels**: Head-to-head entity comparison to identify growth drivers.
+- **Agentic Reasoning**: State-aware orchestration for complex financial pivots (Variance, Comparison, Risk).
+- **Excel-Proof Ingestion**: Robust handling of "dirty" localized CSV/Excel data (₹ symbols, commas, Indian dates).
+- **Executive PDF Dossiers**: Professional report generation with a 13-week trend appendix.
+- **Comparison Duels**: High-performance head-to-head entity and period analysis.
 - **Grounding Logs**: Detailed source transparency for every AI narrative.
 - **Voice Intelligence**: Built-in speech recognition for hands-free querying.
 - **AI abstraction**: AI provider abstraction (`gemini`, `groq`, `openrouter`) with safe fallback handling
