@@ -60,6 +60,12 @@
         .meter-fill.warning { background: var(--accent-red); }
         .meter-fill.success { background: var(--accent-green); }
 
+        .sidebar-history { padding: 16px 0; display: flex; flex-direction: column; gap: 12px; height: 100%; }
+        .history-item { padding: 10px 12px; background: #FAFAFA; border: 1px solid #F0F0F0; border-radius: var(--border-radius-sm); font-size: 11px; color: var(--text-main); cursor: pointer; transition: 0.2s; animation: slideIn 0.3s ease-out both; position: relative; overflow: hidden; }
+        .history-item:hover { border-color: var(--primary); background: var(--primary-light); color: var(--primary); transform: translateX(4px); }
+        .history-time { font-size: 9px; color: var(--text-muted); margin-top: 4px; display: block; }
+        .no-history { font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center; margin-top: 12px; }
+
         .dashboard-view { flex: 1; display: flex; flex-direction: column; background: var(--bg); position: relative; }
         .header { height: 60px; padding: 0 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--header-border); background: white; z-index: 10; }
         .header-title { font-size: 14px; font-weight: 600; color: var(--text-muted); }
@@ -178,6 +184,11 @@
                 </div>
             </div>
 
+            <div class="sidebar-history">
+                <div class="intel-title">Recent Intelligence</div>
+                <div id="history-list" class="no-history">No recent insights yet.</div>
+            </div>
+
             <div class="upload-section">
                 <label for="file-input" class="btn-upload">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><br>
@@ -283,6 +294,7 @@
             initCharts();
             fetchSnapshot();
             initResizer();
+            renderHistory();
         });
 
         function toggleSidebar() {
@@ -374,7 +386,6 @@
                         responseText += "<br><br><strong>Would you like me to export this summary as a professional PDF? (Type 'yes' to confirm)</strong>";
                         awaitingPdfConfirm = true;
                     }
-
                     bubble.innerHTML = `
                         <div class="answer-text">${marked.parse(responseText)}</div>
                         <div class="response-meta"><span class="latency-badge">${data.latencyMs}ms</span><span>Source: ${data.source}</span></div>
@@ -389,9 +400,44 @@
                             </div>
                         </div>
                     `;
+                    saveToHistory(query);
                 }
                 scrollToBottom();
             } catch (err) { console.error(err); }
+        }
+
+        const HISTORY_KEY = 'cg_query_history';
+        function saveToHistory(query) {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            if (history[0] === query) return;
+            history = history.filter(q => q !== query);
+            history.unshift(query);
+            if (history.length > 5) history.pop();
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            if (history.length === 0) {
+                list.innerHTML = 'No recent insights yet.';
+                list.className = 'no-history';
+                return;
+            }
+            list.className = ''; 
+            list.innerHTML = '';
+            history.forEach(query => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                const displayQuery = query.length > 35 ? query.substring(0, 32) + '...' : query;
+                item.innerHTML = `<div>${displayQuery}</div><span class="history-time">Recent Intelligence 🧠</span>`;
+                item.onclick = () => {
+                    document.getElementById('query-input').value = query;
+                    sendQuery(query);
+                };
+                list.appendChild(item);
+            });
         }
 
         function appendMessage(role, text, id = null) {
