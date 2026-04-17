@@ -7,7 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [1.1.0] — 2026-04-12 (Luminous Edition Overhaul)
+## [1.1.0] — 2026-04-12 (Premium Engine Overhaul)
 
 ### Added
 - **Premium Web UI**: Launched the "Warm Notebook" interface—a single-file Vanilla JS platform with a human-centric "warm" aesthetic (Inter font, amber accents).

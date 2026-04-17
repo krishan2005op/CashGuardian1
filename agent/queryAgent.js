@@ -44,10 +44,6 @@ High-Risk Clients:     ${snapshot.highRiskClients.join(", ")}
 Top Expense Category:  ${snapshot.topExpenseCategory}
 ===========================
 
-=== OVERDUE INVOICE LIST ===
-${snapshot.overdueList && snapshot.overdueList.length > 0 ? snapshot.overdueList.map(i => `- ${i.client}: ₹${i.amount.toLocaleString('en-IN')} (Due: ${i.dueDate})`).join('\n') : "No overdue invoices found."}
-===========================
-
 === EXTERNAL VALIDATION REFERENCES ===
 ${validationNotes}
 =====================================
@@ -170,7 +166,7 @@ function safeNumber(val) {
 function safeDate(val) {
   if (val instanceof Date) return val;
   if (!val) return new Date();
-  
+
   // Try mapping DD-MM-YYYY or DD/MM/YYYY to ISO if needed
   if (typeof val === 'string' && (val.includes('-') || val.includes('/'))) {
     const parts = val.split(/[-/]/);
@@ -179,7 +175,7 @@ function safeDate(val) {
       return new Date(Date.UTC(parts[2], parts[1] - 1, parts[0]));
     }
   }
-  
+
   const d = new Date(val);
   return isNaN(d.getTime()) ? new Date() : d;
 }
@@ -198,16 +194,16 @@ function calculateWeeklyTrend(transactions, weekOffset = 0) {
   const absoluteLatest = new Date(Math.max(...dates));
   const weekMs = 7 * 24 * 60 * 60 * 1000;
   const offsetMs = weekOffset * weekMs;
-  
+
   const latest = new Date(absoluteLatest.getTime() - offsetMs);
-  
+
   // 2. Generate 13 weeks of labels
   const trend = { labels: [], revenue: [], expenses: [] };
 
   for (let i = 12; i >= 0; i--) {
     const weekEnd = new Date(latest.getTime() - (i * weekMs));
     const weekStart = new Date(weekEnd.getTime() - weekMs);
-    
+
     // Simple numeric week label
     const weekNum = Math.ceil((weekEnd.getTime() - new Date(weekEnd.getFullYear(), 0, 1).getTime()) / weekMs);
     trend.labels.push(`W${weekNum}`);
@@ -250,7 +246,7 @@ function getSnapshot(customDataset = null) {
     const totalExpenses = cleanedData
       .filter(item => item.type === 'expense' || (!item.type && item.amount < 0))
       .reduce((sum, item) => sum + Math.abs(item.amount), 0);
-    
+
 
     // Breakdown for Donut Chart
     const breakdownMap = cleanedData
@@ -259,7 +255,7 @@ function getSnapshot(customDataset = null) {
         acc[item.category] = (acc[item.category] || 0) + Math.abs(item.amount);
         return acc;
       }, {});
-    
+
     const breakdown = Object.entries(breakdownMap).map(([category, total]) => ({ category, total }));
 
     // --- ENHANCED INTEL FOR CUSTOM DATA ---
@@ -279,19 +275,11 @@ function getSnapshot(customDataset = null) {
         acc[item.client] = (acc[item.client] || 0) + item.amount;
         return acc;
       }, {});
-    
+
     const highRiskClients = Object.entries(overdueClients)
-      .sort((a,b) => b[1] - a[1])
+      .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(([name, amt]) => `${name} (₹${amt.toLocaleString('en-IN')})`);
-
-    const overdueList = cleanedData
-      .filter(item => item.status === 'overdue')
-      .map(item => ({
-        client: item.client || "Unknown",
-        amount: item.amount,
-        dueDate: item.dueDate || "N/A"
-      }));
 
     snapshot = {
       netBalance: totalIncome - totalExpenses,
@@ -299,9 +287,8 @@ function getSnapshot(customDataset = null) {
       totalExpenses,
       overdueCount: cleanedData.filter(item => item.status === 'overdue').length,
       overdueTotal: cleanedData.filter(item => item.status === 'overdue').reduce((sum, item) => sum + item.amount, 0),
-      overdueList,
       highRiskClients: highRiskClients.length > 0 ? highRiskClients : ['None'],
-      topExpenseCategory: breakdown.length > 0 ? breakdown.sort((a,b) => b.total - a.total)[0].category : 'Various',
+      topExpenseCategory: breakdown.length > 0 ? breakdown.sort((a, b) => b.total - a.total)[0].category : 'Various',
       externalValidationNotes: ['Custom dataset active. Analysis based on user-provided transactional boundaries.'],
       trend: calculateWeeklyTrend(cleanedData, 0),
       comparisonTrend: calculateWeeklyTrend(cleanedData, 13),
@@ -591,7 +578,7 @@ function extractClientName(userInput, dataset = null) {
   const normalizedInput = userInput.toLowerCase();
   const source = dataset || invoices;
   const clients = [...new Set(source.map((item) => item.client).filter(Boolean))];
-  
+
   // 1. Exact full name match
   let match = clients.find((client) => normalizedInput.includes(client.toLowerCase()));
   if (match) return match;
@@ -672,12 +659,12 @@ async function handleQuery(userInput, customDataset = null) {
   }
 
   // Benchmark response bypassed to favor dynamic AI reasoning for the hackathon
-    /*
-  const benchmarkResponse = getBenchmarkResponse(userInput);
-  if (benchmarkResponse) {
-    return benchmarkResponse;
-  }
-    */
+  /*
+const benchmarkResponse = getBenchmarkResponse(userInput);
+if (benchmarkResponse) {
+  return benchmarkResponse;
+}
+  */
 
   if (intent === INTENTS.HELP) {
     return getHelpText();
@@ -751,7 +738,7 @@ async function handleQuery(userInput, customDataset = null) {
       const entityA = parts[0].trim().replace(/compare /g, "");
       const entityB = parts[1].trim();
       const duelData = compareEntities(entityA, entityB, customDataset);
-      
+
       const snapshot = getSnapshot(customDataset);
       snapshot.duel = duelData;
       const response = await callAI(buildSystemPrompt(snapshot), userInput);

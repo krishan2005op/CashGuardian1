@@ -8,7 +8,7 @@ const { handleQuery } = require("./agent/queryAgent");
 dotenv.config();
 
 const BANNER = `
-   ✨ CASHGUARDIAN AI [Luminous Edition] ✨
+   ✨ CASHGUARDIAN AI ✨
    ──────────────────────────────────────────
    Self-service Intelligence for your Data
    Demo: Mehta Wholesale Traders (Indian SME)

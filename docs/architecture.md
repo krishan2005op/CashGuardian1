@@ -1,4 +1,4 @@
-# Architecture: CashGuardian [Luminous Edition]
+# Architecture: CashGuardian
 
 CashGuardian is built as a **Local-First AI Assistant**. It uses a layered architecture to ensure that financial logic remains deterministic while AI reasoning provides a natural-language bridge.
 

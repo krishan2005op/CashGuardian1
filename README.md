@@ -1,4 +1,4 @@
-# CashGuardian: Luminous Edition™ 💎
+# CashGuardian
 
 Talk to your business finances in plain English — via natural language, grounded in your operational reality.
 
@@ -29,7 +29,7 @@ Talk to your business finances in plain English — via natural language, ground
 
 ---
 
-CashGuardian: Luminous Edition is a full-stack "Talk to Data" assistant built for the hackathon. It converts natural-language finance questions into deterministic, data-grounded answers using an **Agentic Reasoning Engine**. It runs as both an interactive CLI and a premium web interface.
+CashGuardian is a full-stack "Talk to Data" assistant built for the hackathon. It converts natural-language finance questions into deterministic, data-grounded answers using an **Agentic Reasoning Engine**. It runs as both an interactive CLI and a professional web interface.
 
 The platform is designed for founders, operators, and analysts who need fast, trustworthy insights and professional executive reporting without complex BI workflows.
 
@@ -64,16 +64,24 @@ CashGuardian uses a **Grounded Reasoning** architecture. Every query is orchestr
 
 ```mermaid
 flowchart TD
-    U([User]) --> UI[Luminous Web UI]
+    U([User]) --> UI[Web UI]
     U --> CLI[CLI - readline]
     UI --> S[Express Server]
-    CLI --> A[Luminous Agent]
+    CLI --> A[Query Agent]
     S --> A
-    A --> SN[Grounded Snapshot]
-    SN --> AI[AI Provider Adapter]
-    AI --> G[Gemini 1.5 Flash]
-    AI --> RA[Reasoning Output]
-    RA --> F[formatter.js]
+    A --> IM[intentMap.js]
+    A --> SL[Services Layer]
+    SL --> S1[cashFlowService]
+    SL --> S2[invoiceService]
+    SL --> S3[riskService]
+    SL --> S4[predictionService]
+    SL --> S5[anomalyService]
+    SL --> S6[summaryService]
+    A --> AI[AI Provider Adapter]
+    AI --> G[Gemini]
+    AI --> GR[Groq]
+    AI --> OR[OpenRouter]
+    A --> F[formatter.js]
     F --> U
 ```
 
@@ -82,7 +90,7 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant A as Luminous Agent
+    participant A as Query Agent
     participant S as Services Layer
     participant D as Data Layer
     participant AI as AI Engine
@@ -98,13 +106,13 @@ sequenceDiagram
 
 ---
 
-- **Luminous Agentic Reasoning**: State-aware orchestration for complex financial pivots (Variance, Comparsion, Risk).
+- **Agentic Reasoning**: State-aware orchestration for complex financial pivots (Variance, Comparsion, Risk).
 - **Excel-Proof Ingestion**: Robust handling of localized CSV/Excel data (₹ symbols, commas, Indian dates).
 - **Executive PDF Dossiers**: Professional report generation with visual data appendix.
 - **Performance Duels**: Head-to-head entity comparison to identify growth drivers.
 - **Grounding Logs**: Detailed source transparency for every AI narrative.
 - **Voice Intelligence**: Built-in speech recognition for hands-free querying.
-- **AI abstraction**: Optimized for Gemini 1.5 Flash with safe fallback layers.
+- **AI abstraction**: AI provider abstraction (`gemini`, `groq`, `openrouter`) with safe fallback handling
 - **Web Dashboard**: Glassmorphism UI with real-time 13-week cash flow trajectory.
 - **Benchmark Suite**: 13-case automated accuracy and latency runner.
 
