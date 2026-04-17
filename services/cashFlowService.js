@@ -146,6 +146,42 @@ function getExpenseBreakdown() {
 }
 
 /**
+ * Calculates the delta between two transaction sets grouped by category.
+ * @param {Array<object>} current - Current period transactions.
+ * @param {Array<object>} previous - Previous period transactions.
+ * @returns {{ income: Array<object>, expenses: Array<object> }} Categorized variances.
+ */
+function getCategoryVariances(current, previous) {
+  const currentIncome = summarizeByCategory(current.filter(t => t.type === 'income'));
+  const currentExpenses = summarizeByCategory(current.filter(t => t.type === 'expense'));
+  const prevIncome = summarizeByCategory(previous.filter(t => t.type === 'income'));
+  const prevExpenses = summarizeByCategory(previous.filter(t => t.type === 'expense'));
+
+  const incomeVariances = Object.keys({ ...currentIncome, ...prevIncome }).map(cat => ({
+    category: cat,
+    current: currentIncome[cat] || 0,
+    previous: prevIncome[cat] || 0,
+    delta: (currentIncome[cat] || 0) - (prevIncome[cat] || 0)
+  })).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+
+  const expenseVariances = Object.keys({ ...currentExpenses, ...prevExpenses }).map(cat => ({
+    category: cat,
+    current: currentExpenses[cat] || 0,
+    previous: prevExpenses[cat] || 0,
+    delta: (currentExpenses[cat] || 0) - (prevExpenses[cat] || 0)
+  })).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+
+  return { income: incomeVariances, expenses: expenseVariances };
+}
+
+function summarizeByCategory(items) {
+  return items.reduce((acc, t) => {
+    acc[t.category] = (acc[t.category] || 0) + Number(t.amount);
+    return acc;
+  }, {});
+}
+
+/**
  * Compares current period vs previous period.
  * @param {"week"|"month"} period - Period granularity.
  * @param {number} unitsBack - How many units wide the current/previous windows are.
@@ -199,6 +235,7 @@ function comparePeriods(period, unitsBack = 1) {
       period: `${previousStart.toISOString().slice(0, 10)} to ${previousEnd.toISOString().slice(0, 10)}`
     },
     deltas,
+    variances: getCategoryVariances(currentTransactions, previousTransactions),
     narrative: buildComparisonNarrative(current, previous, deltas, period)
   };
 }
