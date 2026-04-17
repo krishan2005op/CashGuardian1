@@ -13,7 +13,8 @@ const path = require('path');
 // Load environment variables
 dotenv.config();
 
-const { handleQuery, getSnapshot } = require('./agent/queryAgent');
+const { getSnapshot } = require('./agent/queryAgent');
+const { handleQuery } = require('./agent/langChainAgent'); // Migrated to LangGraph
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -73,12 +74,12 @@ app.get('/api/snapshot', (req, res) => {
 
 // ─── API: QUERY ────────────────────────────────────────────────────────────
 app.post('/api/query', async (req, res) => {
-  const { query } = req.body;
+  const { query, history } = req.body;
   if (!query) return res.status(400).json({ error: 'Query required' });
 
   const start = Date.now();
   try {
-    const response = await handleQuery(query, activeDataset);
+    const response = await handleQuery(query, activeDataset, history || []);
     const latencyMs = Date.now() - start;
     
     // Attempting to infer intent for legacy reporting

@@ -229,6 +229,7 @@
         let breakdownChart = null;
         let lastReportContent = '';
         let awaitingPdfConfirm = false;
+        let chatHistory = []; // Conversational memory
 
         window.addEventListener('DOMContentLoaded', () => {
             initCharts();
@@ -262,8 +263,16 @@
                 const res = await fetch('/api/query', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query })
+                    body: JSON.stringify({ 
+                        query,
+                        history: chatHistory 
+                    })
                 });
+                
+                // Track user message in local history
+                chatHistory.push({ role: 'user', content: query });
+                if (chatHistory.length > 10) chatHistory.shift(); // Keep last 10 turns
+
                 const data = await res.json();
                 const bubble = document.getElementById(aiBubbleId);
                 
@@ -271,6 +280,10 @@
                     bubble.innerHTML = `<div style="color: var(--accent-red); font-weight: 600;">⚠️ Query Failed</div><div style="font-size: 13px; margin-top: 4px;">${data.details || data.error}</div>`;
                 } else {
                     let responseText = data.response;
+                    
+                    // Track AI message in local history
+                    chatHistory.push({ role: 'assistant', content: responseText });
+                    if (chatHistory.length > 10) chatHistory.shift();
                     
                     // Check if response is a summary that warrants a PDF export
                     const isSummary = query.toLowerCase().includes('summarise') || query.toLowerCase().includes('summary');
