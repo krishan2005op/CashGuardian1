@@ -32,7 +32,7 @@
 
         .app-container { display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar { width: 240px; background: white; border-right: 1px solid var(--header-border); padding: 24px; display: flex; flex-direction: column; gap: 32px; flex-shrink: 0; transition: width 0.3s ease, padding 0.3s ease; overflow: hidden; }
+        .sidebar { width: 190px; background: white; border-right: 1px solid var(--header-border); padding: 20px; display: flex; flex-direction: column; gap: 24px; flex-shrink: 0; transition: width 0.3s ease, padding 0.3s ease; overflow: hidden; }
         .sidebar.collapsed { width: 0; padding: 0; border-right: none; }
         .logo { display: flex; flex-direction: column; gap: 4px; }
         .logo-text { font-size: 18px; font-weight: 600; color: var(--text-main); }
@@ -50,6 +50,15 @@
         .health-pill { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: inline-flex; align-items: center; gap: 6px; }
         .health-pill.positive { background: #E6F3EC; color: var(--accent-green); }
         .health-pill.negative { background: #FDECEC; color: var(--accent-red); }
+
+        .sidebar-intelligence { padding: 16px 0; border-top: 1px solid var(--header-border); border-bottom: 1px solid var(--header-border); display: flex; flex-direction: column; gap: 16px; margin: 8px 0; }
+        .intel-title { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 4px; }
+        .intel-meter { display: flex; flex-direction: column; gap: 6px; }
+        .meter-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-main); font-weight: 500; }
+        .meter-bg { height: 4px; background: #F0F0F0; border-radius: 2px; overflow: hidden; }
+        .meter-fill { height: 100%; background: var(--primary); transition: width 0.5s ease; width: 0; }
+        .meter-fill.warning { background: var(--accent-red); }
+        .meter-fill.success { background: var(--accent-green); }
 
         .dashboard-view { flex: 1; display: flex; flex-direction: column; background: var(--bg); position: relative; }
         .header { height: 60px; padding: 0 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--header-border); background: white; z-index: 10; }
@@ -156,6 +165,18 @@
                     <span>Dashboard</span>
                 </span>
             </nav>
+
+            <div class="sidebar-intelligence">
+                <div class="intel-title">Digital Health</div>
+                <div class="intel-meter">
+                    <div class="meter-label"><span>Liquidity</span><span id="meter-liq-val">0%</span></div>
+                    <div class="meter-bg"><div id="meter-liq-fill" class="meter-fill success"></div></div>
+                </div>
+                <div class="intel-meter">
+                    <div class="meter-label"><span>Risk Level</span><span id="meter-risk-val">Low</span></div>
+                    <div class="meter-bg"><div id="meter-risk-fill" class="meter-fill success"></div></div>
+                </div>
+            </div>
 
             <div class="upload-section">
                 <label for="file-input" class="btn-upload">
@@ -532,6 +553,21 @@
                 // Update dynamic charts
                 if (data.trend) updateTrendChart(data.trend, data.comparisonTrend);
                 if (data.breakdown) updateBreakdownChart(data.breakdown);
+
+                // Update Sidebar Intelligence Meters
+                const liqPercent = data.netBalance >= 0 ? '94%' : '28%';
+                const liqColor = data.netBalance >= 0 ? 'success' : 'warning';
+                document.getElementById('meter-liq-val').innerText = liqPercent;
+                document.getElementById('meter-liq-fill').style.width = liqPercent;
+                document.getElementById('meter-liq-fill').className = 'meter-fill ' + liqColor;
+
+                const hasRisk = data.highRiskClients.length > 0;
+                const riskText = hasRisk ? 'High' : 'Low';
+                const riskPercent = hasRisk ? '88%' : '12%';
+                const riskColor = hasRisk ? 'warning' : 'success';
+                document.getElementById('meter-risk-val').innerText = riskText;
+                document.getElementById('meter-risk-fill').style.width = riskPercent;
+                document.getElementById('meter-risk-fill').className = 'meter-fill ' + riskColor;
             } catch (err) { console.error(err); }
         }
 
