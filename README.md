@@ -76,7 +76,15 @@ graph TD
 
     subgraph "Intelligence_Agent (Grounded Core)"
         Q[queryAgent.js]
-        SVC[Services Layer]
+        
+        subgraph "Services_Layer (Deterministic)"
+            S1[cashFlowService]
+            S2[invoiceService]
+            S3[riskService]
+            S4[predictionService]
+            S5[anomalyService]
+            S6[summaryService]
+        end
     end
 
     subgraph "Data_Sources"
@@ -94,9 +102,18 @@ graph TD
     C --> Q
     S --> Q
     DS --> Q
-    Q --> SVC
-    SVC --> D
-    SVC --> U
+    Q --> S1
+    Q --> S2
+    Q --> S3
+    Q --> S4
+    Q --> S5
+    Q --> S6
+    
+    S1 --> D
+    S1 --> U
+    S2 --> D
+    S2 --> U
+
     Q -- "Grounded" --> AI_G
     Q -- "Grounded" --> AI_GR
     Q -- "Grounded" --> AI_GPT
