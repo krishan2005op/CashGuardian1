@@ -802,5 +802,6 @@ module.exports = {
   fallbackResponse,
   extractClientName,
   getHelpText,
-  getBenchmarkResponse
+  getBenchmarkResponse,
+  formatDecompositionTable
 };
