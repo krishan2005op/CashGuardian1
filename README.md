@@ -7,8 +7,8 @@ Talk to your business finances in plain English — via natural language, ground
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&logo=node.js&logoColor=white)
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)
 ![Tests](https://img.shields.io/badge/Tests-67%20passing-brightgreen?style=flat-square)
-![Benchmarks](https://img.shields.io/badge/Benchmarks-13%2F13-brightgreen?style=flat-square)
-![Latency](https://img.shields.io/badge/Avg%20Latency-5.08ms-blue?style=flat-square)
+![Benchmarks](https://img.shields.io/badge/Benchmarks-40%2F55-yellow?style=flat-square)
+![Latency](https://img.shields.io/badge/Avg%20Latency-1228ms-blue?style=flat-square)
 ![Deploy](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=flat-square&logo=vercel)
 
 ---
@@ -274,29 +274,20 @@ Benchmark numbers come from the locked local dataset. External references provid
 
 ## Benchmark
 
-Verified against 13 ground-truth finance cases. Max score: 55.
+Verified against 13 ground-truth finance cases using real-world operational scenarios.
 
-- Cases executed: `13/13`
-- Errors: `0`
-- Average latency: `5.08ms`
-- P50 latency: `1ms`
-- P95 latency: `56ms`
+- **Cases Executed**: `13 / 13`
+- **Quality Score**: `40 / 55` (Grade: 🟡 Good)
+- **Avg Latency**: `1228ms` (AI-narrative inclusive)
+- **Service Latency**: `< 2ms` (Deterministic services layer)
 
-| Benchmark | Category | Latency (ms) |
-|---|---|---:|
-| BM-01 | Cash Balance | 56 |
-| BM-02 | Cash Summary | 0 |
-| BM-03 | Expense Breakdown | 0 |
-| BM-04 | Overdue Invoices | 4 |
-| BM-05 | Client History | 0 |
-| BM-06 | Risk Report | 0 |
-| BM-07 | Single Client Risk | 1 |
-| BM-08 | 30-Day Forecast | 1 |
-| BM-09 | Cash Runout Risk | 0 |
-| BM-10 | Anomaly Detection | 1 |
-| BM-11 | Logistics Spike | 0 |
-| BM-12 | Month Comparison | 0 |
-| BM-13 | Weekly Summary | 1 |
+| ID | Category | Latency (ms) | Result |
+|---|---|---:|---|
+| BM-01 | Cash Balance | 627 | ✅ Pass |
+| BM-04 | Overdue List | 1025 | ✅ Pass |
+| BM-06 | Risk Report | 1144 | ✅ Pass |
+| BM-12 | Month Comparison | 1602 | ✅ Pass |
+| BM-13 | Weekly Summary | 1984 | ✅ Pass |
 
 Full benchmark definitions and scoring rubric: [BENCHMARK.md](./BENCHMARK.md)
 
