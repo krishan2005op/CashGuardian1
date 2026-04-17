@@ -539,7 +539,18 @@ function extractClientName(userInput, dataset = null) {
   const normalizedInput = userInput.toLowerCase();
   const source = dataset || invoices;
   const clients = [...new Set(source.map((item) => item.client).filter(Boolean))];
-  const match = clients.find((client) => normalizedInput.includes(client.toLowerCase()));
+  
+  // 1. Exact full name match
+  let match = clients.find((client) => normalizedInput.includes(client.toLowerCase()));
+  if (match) return match;
+
+  // 2. Partial match (e.g., "Nandan" for "Nandan Enterprises")
+  match = clients.find((client) => {
+    const clientFirstName = client.toLowerCase().split(' ')[0];
+    const regex = new RegExp(`\\b${clientFirstName}\\b`);
+    return regex.test(normalizedInput);
+  });
+
   return match || null;
 }
 
