@@ -18,7 +18,7 @@ const {
   getInvoicesByClient
 } = require("../services/invoiceService");
 const { getRiskReport, getClientRisk } = require("../services/riskService");
-const { decomposeTransactions } = require("./decompositionService");
+const { decomposeTransactions } = require("../services/decompositionService");
 const { detectAnomalies } = require("../services/anomalyService");
 const { generateSummary } = require("../services/summaryService");
 const { sendPaymentReminder } = require("../services/emailService");
@@ -127,7 +127,7 @@ async function executeNode(state) {
 
   // 3. New Decomposition (Breakdown) handling
   if (intent === INTENTS.DECOMPOSITION) {
-    const { decomposeTransactions } = require("./decompositionService");
+    const { decomposeTransactions } = require("../services/decompositionService");
     const { formatDecompositionTable } = require("./queryAgent");
     const norm = userInput.toLowerCase();
     let decompType = "expense";
