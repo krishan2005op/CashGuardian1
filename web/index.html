@@ -368,26 +368,24 @@
             const gold = [193, 126, 74];
             const darkBrown = [44, 36, 23];
             
-            // 1. Watermark (Add logo first so text is on top)
+            // --- PAGE 1: EXECUTIVE SUMMARY ---
+            // 1. Watermark
             const logoUrl = '/logo.png'; 
             try {
-                // We use a GState for low opacity to make it a watermark
                 doc.setGState(new doc.GState({ opacity: 0.1 }));
                 doc.addImage(logoUrl, 'PNG', 45, 80, 120, 120);
-                doc.setGState(new doc.GState({ opacity: 1.0 })); // Reset
-            } catch (e) { console.warn('Logo watermark failed to load:', e); }
+                doc.setGState(new doc.GState({ opacity: 1.0 }));
+            } catch (e) { console.warn('Logo watermark failed'); }
 
-            // Formal Memorandum Header
+            // Header
             doc.setTextColor(...gold);
             doc.setFont("times", "bold");
             doc.setFontSize(22);
             doc.text("CASHGUARDIAN INTELLIGENCE™", 105, 25, { align: 'center' });
-            
             doc.setTextColor(...darkBrown);
             doc.setFont("times", "italic");
             doc.setFontSize(10);
             doc.text("Professional Financial Analysis Executive Brief", 105, 33, { align: 'center' });
-            
             doc.setDrawColor(...gold);
             doc.setLineWidth(0.5);
             doc.line(20, 38, 190, 38);
@@ -399,7 +397,7 @@
             doc.text(`Internal Record ID: CG-${Date.now().toString().slice(-6)}`, 20, 48);
             doc.text(`Report Date: ${date}`, 140, 48);
 
-            // Clean text for PDF (Remove Markdown artifacts and Fix Encoding)
+            // Analysis Section
             let cleanText = text
                 .replace(/₹/g, 'Rs. ') 
                 .replace(/####\s/g, '\n\n')
@@ -409,7 +407,6 @@
                 .replace(/---/g, '\n--------------------------------------------------\n')
                 .replace(/<br>/g, '\n');
 
-            // Analysis Section
             doc.setTextColor(...gold);
             doc.setFontSize(14);
             doc.setFont("times", "bold");
@@ -419,17 +416,52 @@
             doc.setFont("times", "normal");
             doc.setFontSize(11);
             doc.setLineHeightFactor(1.5);
-            
             const splitText = doc.splitTextToSize(cleanText, 170);
             doc.text(splitText, 20, 75);
             
-            // Footer
-            const pageHeight = doc.internal.pageSize.height;
+            // Page 1 Footer
             doc.setFontSize(9);
             doc.setTextColor(150, 150, 150);
-            doc.text("© 2026 CashGuardian. This report contains confidential SME financial intelligence.", 20, pageHeight - 15);
+            const pageHeight = doc.internal.pageSize.height;
+            doc.text("Page 1 | Confidential Financial Intelligence", 105, pageHeight - 10, { align: 'center' });
+
+            // --- PAGE 2: VISUAL ANALYTICS ---
+            doc.addPage();
             
-            doc.save(`CashGuardian_Report_${Date.now()}.pdf`);
+            // Page 2 Header
+            doc.setTextColor(...gold);
+            doc.setFont("times", "bold");
+            doc.setFontSize(18);
+            doc.text("VISUAL DATA SUPPLEMENT", 20, 25);
+            doc.setDrawColor(...gold);
+            doc.line(20, 28, 190, 28);
+
+            try {
+                // 1. Trend Chart
+                const trendCanvas = document.getElementById('cashflow-chart');
+                const trendData = trendCanvas.toDataURL('image/png', 1.0);
+                doc.setTextColor(...darkBrown);
+                doc.setFontSize(12);
+                doc.text("Cash Flow Trajectory (Revenue vs Expenses)", 20, 40);
+                doc.addImage(trendData, 'PNG', 20, 45, 170, 85);
+
+                // 2. Breakdown Chart
+                const breakdownCanvas = document.getElementById('breakdown-chart');
+                const breakdownData = breakdownCanvas.toDataURL('image/png', 1.0);
+                doc.text("Expense Decomposition by Category", 20, 150);
+                doc.addImage(breakdownData, 'PNG', 45, 155, 120, 80);
+            } catch (err) {
+                console.warn('Could not export charts:', err);
+                doc.setTextColor(200, 0, 0);
+                doc.text("Note: High-fidelity visualizations were unavailable at time of export.", 20, 40);
+            }
+
+            // Page 2 Footer
+            doc.setFontSize(9);
+            doc.setTextColor(150, 150, 150);
+            doc.text("Page 2 | Visual Data Appendix", 105, pageHeight - 10, { align: 'center' });
+            
+            doc.save(`CashGuardian_Dossier_${Date.now()}.pdf`);
         }
 
         async function fetchSnapshot() {
