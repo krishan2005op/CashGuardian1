@@ -98,11 +98,12 @@ function buildComparisonNarrative(current, previous, deltas, period) {
 
 /**
  * Returns current net cash position.
- * Ground truth: income=925500, expenses=938000, net=-12500
+ * @param {Array<object>} dataset - Optional transaction set.
  * @returns {{ totalIncome: number, totalExpenses: number, netBalance: number }}
  */
-function getCashBalance() {
-  const totals = summarizeTransactions(transactions);
+function getCashBalance(dataset = transactions) {
+  const data = dataset || transactions;
+  const totals = summarizeTransactions(data);
 
   return {
     totalIncome: totals.income,
@@ -114,14 +115,16 @@ function getCashBalance() {
 /**
  * Returns cash flow summary for last N days.
  * @param {number} days - Number of days to summarize.
+ * @param {Array<object>} dataset - Optional transaction set.
  * @returns {{ period: string, income: number, expenses: number, net: number, topExpenseCategory: string }}
  */
-function getCashSummary(days = 30) {
-  const latestDate = getLatestTransactionDate();
+function getCashSummary(days = 30, dataset = transactions) {
+  const data = dataset || transactions;
+  const latestDate = getLatestTransactionDate(data);
   const from = new Date(latestDate);
   from.setUTCDate(from.getUTCDate() - (days - 1));
 
-  const periodTransactions = getTransactionsInRange(from, latestDate);
+  const periodTransactions = getTransactionsInRange(from, latestDate, data);
   const totals = summarizeTransactions(periodTransactions);
   const topExpenseCategory = getExpenseTotals(periodTransactions)[0];
 
@@ -136,17 +139,18 @@ function getCashSummary(days = 30) {
 
 /**
  * Returns expenses grouped by category with percentages.
- * Ground truth: salaries=360000(38%), logistics=318000(34%), rent=180000(19%)
+ * @param {Array<object>} dataset - Optional transaction set.
  * @returns {Array<{ category: string, total: number, percentage: string }>}
  */
-function getExpenseBreakdown() {
-  const expenseTotals = getExpenseTotals(transactions);
+function getExpenseBreakdown(dataset = transactions) {
+  const data = dataset || transactions;
+  const expenseTotals = getExpenseTotals(data);
   const totalExpenses = expenseTotals.reduce((sum, item) => sum + item.total, 0);
 
   return expenseTotals.map((item) => ({
     category: item.category,
     total: item.total,
-    percentage: `${Math.round((item.total / totalExpenses) * 100)}%`
+    percentage: `${totalExpenses > 0 ? Math.round((item.total / totalExpenses) * 100) : 0}%`
   }));
 }
 
@@ -216,8 +220,8 @@ function summarizeEntityMetrics(entity, dataset = transactions) {
     (t.description && t.description.toLowerCase().includes(norm))
   );
 
-  const revenue = matches.filter(t => t.type === 'income').reduce((s,t) => s + (Number(t.amount) || 0), 0);
-  const costs = matches.filter(t => t.type === 'expense').reduce((s,t) => s + Math.abs(Number(t.amount) || 0), 0);
+  const revenue = matches.filter(t => t.type === 'income' || t.type === 'sales').reduce((s,t) => s + (Number(t.amount) || 0), 0);
+  const costs = matches.filter(t => t.type === 'expense' || t.amount < 0).reduce((s,t) => s + Math.abs(Number(t.amount) || 0), 0);
   const volume = matches.length;
   
   // Growth WoW (Last 7 days vs 7 days before)
@@ -246,9 +250,10 @@ function summarizeEntityMetrics(entity, dataset = transactions) {
  * @returns {object} Head-to-head comparison result.
  */
 function compareEntities(a, b, dataset = transactions) {
+  const data = dataset || transactions;
   return {
-    entityA: { name: a, ...summarizeEntityMetrics(a, dataset) },
-    entityB: { name: b, ...summarizeEntityMetrics(b, dataset) }
+    entityA: { name: a, ...summarizeEntityMetrics(a, data) },
+    entityB: { name: b, ...summarizeEntityMetrics(b, data) }
   };
 }
 
@@ -256,10 +261,12 @@ function compareEntities(a, b, dataset = transactions) {
  * Compares current period vs previous period.
  * @param {"week"|"month"} period - Period granularity.
  * @param {number} unitsBack - How many units wide the current/previous windows are.
+ * @param {Array<Object>} dataset - Optional transaction set.
  * @returns {{ current: object, previous: object, deltas: { income: number, expenses: number, net: number }, narrative: string }}
  */
-function comparePeriods(period, unitsBack = 1) {
-  const latestDate = getLatestTransactionDate();
+function comparePeriods(period, unitsBack = 1, dataset = transactions) {
+  const data = dataset || transactions;
+  const latestDate = getLatestTransactionDate(data);
   let currentStart;
   let previousStart;
   let previousEnd;
@@ -286,8 +293,8 @@ function comparePeriods(period, unitsBack = 1) {
     throw new Error("period must be 'week' or 'month'");
   }
 
-  const currentTransactions = getTransactionsInRange(currentStart, latestDate);
-  const previousTransactions = getTransactionsInRange(previousStart, previousEnd);
+  const currentTransactions = getTransactionsInRange(currentStart, latestDate, data);
+  const previousTransactions = getTransactionsInRange(previousStart, previousEnd, data);
   const current = summarizeTransactions(currentTransactions);
   const previous = summarizeTransactions(previousTransactions);
   const deltas = {
@@ -319,5 +326,7 @@ module.exports = {
   compareEntities,
   getLatestTransactionDate,
   getTransactionsInRange,
-  getCategoryVariances
+  getCategoryVariances,
+  summarizeTransactions,
+  getExpenseTotals
 };

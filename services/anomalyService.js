@@ -33,6 +33,7 @@ function getSeverity(deviation) {
 
 /**
  * Detects anomalies in income and expense patterns.
+ * @param {Array<Object>} [customTransactions] - Optional custom data to analyze.
  * @returns {Array<{
  *   type: "income" | "expense",
  *   category: string,
@@ -44,9 +45,10 @@ function getSeverity(deviation) {
  *   explanation: string
  * }>}
  */
-function detectAnomalies() {
-  const weeks = [...new Set(transactions.map((transaction) => getWeekLabel(transaction.date)))].sort();
-  const groupedBySeries = transactions.reduce((seriesMap, transaction) => {
+function detectAnomalies(customTransactions = null) {
+  const sourceData = customTransactions || transactions;
+  const weeks = [...new Set(sourceData.map((transaction) => getWeekLabel(transaction.date)))].sort();
+  const groupedBySeries = sourceData.reduce((seriesMap, transaction) => {
     const seriesKey = `${transaction.type}|${transaction.category}`;
     const week = getWeekLabel(transaction.date);
 
@@ -70,7 +72,8 @@ function detectAnomalies() {
         .map((previousWeek) => valuesByWeek[previousWeek] || 0)
         .filter((value) => value > 0);
 
-      if (actual === 0 || previousWeeks.length < 4) {
+      // Sensitivity: Require at least 2 data points for analysis in a 2-month window
+      if (actual === 0 || previousWeeks.length < 2) {
         return;
       }
 

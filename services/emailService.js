@@ -5,24 +5,18 @@ const clientContacts = require("../data/clientContacts.json");
 /**
  * Resolves a reminder recipient email.
  * Resolution order:
- * 1) explicit EMAIL_TO override
- * 2) client mapping from customDataset (if provided)
- * 3) client mapping from data/clientContacts.json
+ * 1) client mapping from customDataset (if provided)
+ * 2) client mapping from data/clientContacts.json
+ * 3) explicit EMAIL_TO (only if set, used for debug/override)
  * 4) EMAIL_USER fallback
  * @param {string} clientName - Business client name.
  * @param {Array<Object>|null} customDataset - Optional active dataset.
  * @returns {string | null} Email address to send reminder to.
  */
 function resolveRecipient(clientName, customDataset = null) {
-  // 1) HIGHEST PRIORITY: explicit EMAIL_TO override for testing/demos
-  if (process.env.EMAIL_TO) {
-    console.log(`📧 Using explicit EMAIL_TO override: ${process.env.EMAIL_TO}`);
-    return process.env.EMAIL_TO;
-  }
-
   const normalizedClient = clientName ? clientName.toLowerCase() : "";
 
-  // 2) Client mapping from customDataset (if provided)
+  // 1) Higher Priority: Client mapping from customDataset (if provided)
   if (customDataset && customDataset.length > 0) {
     const row = customDataset.find(item => {
       // Find the client key (robust)
@@ -44,10 +38,16 @@ function resolveRecipient(clientName, customDataset = null) {
     }
   }
 
-  // 3) Static client contact map (data/clientContacts.json)
+  // 2) Static client contact map (data/clientContacts.json)
   if (clientContacts[clientName]) {
     console.log(`📧 Resolved recipient from clientContacts.json: ${clientContacts[clientName]}`);
     return clientContacts[clientName];
+  }
+
+  // 3) Explicit EMAIL_TO override (lowest priority, used for testing/demos)
+  if (process.env.EMAIL_TO) {
+    console.log(`📧 Using explicit EMAIL_TO override: ${process.env.EMAIL_TO}`);
+    return process.env.EMAIL_TO;
   }
 
   // 4) Last resort: EMAIL_USER fallback

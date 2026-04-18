@@ -171,17 +171,34 @@ async function executeNode(state) {
 
   // Check for Head-to-Head Comparison (Duel)
   const normalized = userInput.toLowerCase();
+  
+  // Robust pattern: match anything "vs" or "versus" anything, cleaning common noise
   if (intent === INTENTS.COMPARE && (normalized.includes(" vs ") || normalized.includes(" versus "))) {
-    const parts = normalized.split(/ vs | versus /);
-    const entityA = parts[0].trim().replace(/compare /g, "");
-    const entityB = parts[1].trim();
-    snapshot.duel = compareEntities(entityA, entityB);
-    console.log(`[LangGraph] Duel detected: ${entityA} vs ${entityB}`);
+    const cleanInput = normalized
+      .replace(/.*compare /i, "") // Capture everything after the word "compare"
+      .replace(/["']/g, "")
+      .replace(/\.$/, "");        // Remove trailing period
+    
+    // If it's a period comparison (month vs month), route to comparePeriods
+    if (cleanInput.includes("month") || cleanInput.includes("week")) {
+      const { comparePeriods } = require("../services/cashFlowService");
+      const period = cleanInput.includes("month") ? "month" : "week";
+      snapshot.periodComparison = comparePeriods(period, 1, activeDataset);
+    } else {
+      const parts = cleanInput.split(/ vs | versus /);
+      if (parts.length >= 2) {
+        const entityA = parts[0].trim();
+        const entityB = parts[1].trim();
+        const { compareEntities } = require("../services/cashFlowService");
+        snapshot.duel = compareEntities(entityA, entityB, activeDataset);
+        console.log(`[LangGraph] Duel detected: ${entityA} vs ${entityB}`);
+      }
+    }
   }
 
   const systemPrompt = buildSystemPrompt(snapshot) + 
     (lastClient ? `\n\nCONTEXT: You are currently discussing "${lastClient}". If the user uses pronouns like "him", "them", or "that client", they refer to "${lastClient}".` : "") +
-    `\n\nGROUNDING RULE: Answer ONLY using the data provided in the snapshot. If the data is sparse, be brief and professional. Do NOT invent reasoning or "Why" factors that are not explicitly stated in the variance drivers or external validation notes. Accuracy is prioritized over length.`;
+    `\n\nGROUNDING RULE: Answer ONLY using the data provided in the snapshot. Be professional and provide executive-level analysis of any variance drivers or anomalies listed. Do NOT invent numbers, but you MAY discuss the "Why" if it is logically implied by the category and transaction descriptions (e.g., "Emergency Shipment" implies logistics urgency). Accuracy is prioritized over length.`;
 
   const llm = getLLM();
   const result = await llm.invoke([
