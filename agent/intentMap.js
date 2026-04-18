@@ -12,6 +12,7 @@ const INTENTS = {
   WEEKLY_SUMMARY: "weekly_summary",
   COMPARE: "compare",
   DECOMPOSITION: "decomposition",
+  PREDICTION: "prediction",
   HELP: "help",
   UNKNOWN: "unknown"
 };
@@ -28,6 +29,7 @@ const INTENT_RULES = [
   { intent: INTENTS.SEND_REMINDER, keywords: ["send", "remind", "email", "reminder", "mail", "notify"] },
   { intent: INTENTS.WEEKLY_SUMMARY, keywords: ["weekly", "this week", "digest", "last 7 days"] },
   { intent: INTENTS.COMPARE, keywords: ["compare", "vs", "versus", "last month", "this month", "growth"] },
+  { intent: INTENTS.PREDICTION, keywords: ["forecast", "predict", "next 30 days", "projected balance", "future", "likely balance"] },
   { intent: INTENTS.HELP, keywords: ["help", "what can you", "commands", "guide"] }
 ];
 

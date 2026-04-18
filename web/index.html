@@ -414,6 +414,10 @@
                         document.getElementById('duel-narrative').innerText = data.duel.analysis?.narrative || "Head-to-head comparison active.";
                         document.getElementById('duel-card').style.display = 'block';
                     }
+
+                    if (data.trend) {
+                        updateTrendChart(data.trend, data.comparisonTrend);
+                    }
                 }
                 scrollToBottom();
             } catch (err) { console.error(err); }

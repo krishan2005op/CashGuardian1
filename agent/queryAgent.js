@@ -12,18 +12,21 @@ const {
   compareEntities,
   getLatestTransactionDate,
   getTransactionsInRange,
-  getCategoryVariances
+  getCategoryVariances,
+  calculateWeeklyTrend
 } = require("../services/cashFlowService");
 const {
   getOverdueInvoices,
-  getInvoicesByClient
+  getInvoicesByClient,
+  getUpcomingDue
 } = require("../services/invoiceService");
 const { getRiskReport, getClientRisk } = require("../services/riskService");
 const { detectAnomalies } = require("../services/anomalyService");
 const { generateSummary } = require("../services/summaryService");
 const { decomposeTransactions } = require("../services/decompositionService");
 const { sendPaymentReminder } = require("../services/emailService");
-const { formatCurrency } = require("../utils/formatter");
+const { calculate30DayForecast } = require("../services/predictionService");
+const { formatCurrency, safeDate, safeNumber } = require("../utils/formatter");
 
 /**
  * Builds the live system prompt used for AI answers.
@@ -152,79 +155,9 @@ function fallbackResponse() {
   return "AI service unavailable. Check AI_API_KEY and AI_PROVIDER in .env. Financial data is still accessible - type 'help' for rule-based commands.";
 }
 
-/**
- * Clean numeric strings (removes ₹, commas, etc and handles NaN)
- */
-function safeNumber(val) {
-  if (typeof val === 'number') return val;
-  if (!val) return 0;
-  const clean = val.toString().replace(/[₹$,\s]/g, '');
-  const num = parseFloat(clean);
-  return isNaN(num) ? 0 : num;
-}
+// Data sanitization helpers now imported from utils/formatter.js
 
-/**
- * Robust date parser for common Excel/CSV formats (DD-MM-YYYY, ISO, etc)
- */
-function safeDate(val) {
-  if (val instanceof Date) return val;
-  if (!val) return new Date();
-
-  // Try mapping DD-MM-YYYY or DD/MM/YYYY to ISO if needed
-  if (typeof val === 'string' && (val.includes('-') || val.includes('/'))) {
-    const parts = val.split(/[-/]/);
-    if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) {
-      // Assuming DD-MM-YYYY
-      return new Date(Date.UTC(parts[2], parts[1] - 1, parts[0]));
-    }
-  }
-
-  const d = new Date(val);
-  return isNaN(d.getTime()) ? new Date() : d;
-}
-
-/**
- * Helper to group transactions into weekly buckets for the trend graph.
- * @param {Array<Object>} transactions - List of transaction objects.
- * @param {number} weekOffset - Number of weeks to shift back (0 for current, 13 for previous).
- * @returns {{ labels: string[], revenue: number[], expenses: number[] }}
- */
-function calculateWeeklyTrend(transactions, weekOffset = 0) {
-  if (!transactions.length) return { labels: [], revenue: [], expenses: [] };
-
-  // 1. Find the latest relative point
-  const dates = transactions.map(t => safeDate(t.date));
-  const absoluteLatest = new Date(Math.max(...dates));
-  const weekMs = 7 * 24 * 60 * 60 * 1000;
-  const offsetMs = weekOffset * weekMs;
-
-  const latest = new Date(absoluteLatest.getTime() - offsetMs);
-
-  // 2. Generate 13 weeks of labels
-  const trend = { labels: [], revenue: [], expenses: [] };
-
-  for (let i = 12; i >= 0; i--) {
-    const weekEnd = new Date(latest.getTime() - (i * weekMs));
-    const weekStart = new Date(weekEnd.getTime() - weekMs);
-
-    // Simple numeric week label
-    const weekNum = Math.ceil((weekEnd.getTime() - new Date(weekEnd.getFullYear(), 0, 1).getTime()) / weekMs);
-    trend.labels.push(`W${weekNum}`);
-
-    const weekTransactions = transactions.filter(t => {
-      const d = safeDate(t.date);
-      return d > weekStart && d <= weekEnd;
-    });
-
-    const income = weekTransactions.filter(t => t.type === 'income').reduce((s, t) => s + safeNumber(t.amount), 0);
-    const expense = weekTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Math.abs(safeNumber(t.amount)), 0);
-
-    trend.revenue.push(income);
-    trend.expenses.push(expense);
-  }
-
-  return trend;
-}
+// Removed local calculateWeeklyTrend - moved to services/cashFlowService.js
 
 /**
  * Builds a global snapshot for AI grounding and UI metrics.
@@ -823,7 +756,33 @@ async function handleQuery(userInput, customDataset = null) {
       }
     }
     const period = userInput.toLowerCase().includes("month") ? "month" : "week";
-    return maybeUseAI(userInput, formatComparison(comparePeriods(period, 1, customDataset)), customDataset);
+    const comparison = comparePeriods(period, 1, customDataset);
+    const response = await maybeUseAI(userInput, formatComparison(comparison), customDataset);
+    return {
+      content: response,
+      trend: comparison.currentTrend,
+      comparisonTrend: comparison.previousTrend
+    };
+  }
+
+  if (intent === INTENTS.PREDICTION) {
+    const forecast = calculate30DayForecast(customDataset);
+    const snapshot = getSnapshot(customDataset);
+    const systemPrompt = buildSystemPrompt(snapshot) +
+      `\n\n### MANDATORY DATA SOURCE: 30-DAY FORECAST\n` +
+      `Match the user's focus on the next 30 days using these components:\n` +
+      `Current Balance: ${formatCurrency(forecast.openingBalance)}\n` +
+      `Daily Revenue (Avg): ${formatCurrency(forecast.avgDailyRevenue)} (Total 30d Projection: ${formatCurrency(forecast.projectedRevenue)})\n` +
+      `Daily Burn (Avg): ${formatCurrency(forecast.avgDailyBurn)} (Total 30d Projection: ${formatCurrency(forecast.projectedBurn)})\n` +
+      `Upcoming Invoices: ${formatCurrency(forecast.upcomingTotal)}\n` +
+      `Projected 30-Day Balance: ${formatCurrency(forecast.finalBalance)}\n` +
+      `Reasoning: ${forecast.reasoning}\n` +
+      `### END DATA SOURCE\n\n` +
+      `Task: Provide a detailed strategic analysis of the 30-day forecast. Be professional. Explain how the burn rate affects the closing balance. ` +
+      `NEVER invent numbers. If the trend is negative, suggest a specific cost-cutting measure based on the top expense category.`;
+
+    const summary = await callAI(systemPrompt, userInput);
+    return summary;
   }
 
   return hasAiCredentials()

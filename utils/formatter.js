@@ -108,6 +108,30 @@ function printTable(rows, columns) {
   ].join("\n");
 }
 
+/**
+ * Safely parses a number from various formats (₹, strings, etc).
+ * @param {any} val - Value to parse.
+ * @returns {number} Cleaned numeric value.
+ */
+function safeNumber(val) {
+  if (typeof val === 'number') return val;
+  if (!val) return 0;
+  const cleaned = String(val).replace(/[₹,]/g, '').trim();
+  return parseFloat(cleaned) || 0;
+}
+
+/**
+ * Safely parses a date string into a Date object.
+ * @param {string} val - Date string.
+ * @returns {Date} Parsed date object.
+ */
+function safeDate(val) {
+  if (val instanceof Date) return val;
+  if (!val) return new Date();
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
 module.exports = {
   printHeader,
   printRow,
@@ -115,5 +139,7 @@ module.exports = {
   printAlert,
   printDivider,
   formatCurrency,
-  formatDate
+  formatDate,
+  safeNumber,
+  safeDate
 };

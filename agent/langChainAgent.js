@@ -163,7 +163,36 @@ async function executeNode(state) {
 
     return {
       response: `${resultAI.content.trim()}\n${table}`,
-      duel: null
+      duel: null,
+      trend: null,
+      comparisonTrend: null
+    };
+  }
+
+  // 4. Prediction Mode
+  if (intent === INTENTS.PREDICTION) {
+    const { calculate30DayForecast } = require("../services/predictionService");
+    const forecast = calculate30DayForecast(activeDataset);
+
+    const systemPrompt = buildSystemPrompt(snapshot) +
+      `\n\n### MANDATORY DATA SOURCE: 30-DAY FORECAST\n` +
+      `Opening Balance: ${formatCurrency(forecast.openingBalance)}\n` +
+      `Projected Revenue (30d): ${formatCurrency(forecast.projectedRevenue)} (Daily Avg: ${formatCurrency(forecast.avgDailyRevenue)})\n` +
+      `Projected Burn (30d): ${formatCurrency(forecast.projectedBurn)} (Daily Avg: ${formatCurrency(forecast.avgDailyBurn)})\n` +
+      `Upcoming Invoices: ${formatCurrency(forecast.upcomingTotal)}\n` +
+      `30-Day Project Balance: ${formatCurrency(forecast.finalBalance)}\n` +
+      `Reasoning: ${forecast.reasoning}\n` +
+      `### END DATA SOURCE\n\n` +
+      `Task: Provide an executive narrative of this 30-day forecast. Explain how the historical burn rate and upcoming receivables combine to reach the final balance. Accuracy is mandatory.`;
+
+    const llm = getLLM();
+    const resultAI = await llm.invoke([new SystemMessage(systemPrompt), ...messages]);
+
+    return {
+      response: resultAI.content,
+      duel: null,
+      trend: null,
+      comparisonTrend: null
     };
   }
 
@@ -210,7 +239,9 @@ async function executeNode(state) {
 
   return { 
     response: result.content,
-    duel: snapshot.duel || null 
+    duel: snapshot.duel || null,
+    trend: snapshot.periodComparison ? snapshot.periodComparison.currentTrend : null,
+    comparisonTrend: snapshot.periodComparison ? snapshot.periodComparison.previousTrend : null
   };
 }
 
@@ -239,6 +270,14 @@ const StateAnnotation = Annotation.Root({
     default: () => null,
   }),
   duel: Annotation({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
+  }),
+  trend: Annotation({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
+  }),
+  comparisonTrend: Annotation({
     reducer: (x, y) => y ?? x,
     default: () => null,
   })
@@ -284,7 +323,9 @@ async function handleQuery(userInput, customDataset = null, history = []) {
 
     return {
       content: result.response,
-      duel: result.duel
+      duel: result.duel,
+      trend: result.trend,
+      comparisonTrend: result.comparisonTrend
     };
   } catch (error) {
     console.error("[LangGraph Error]", error);

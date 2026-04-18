@@ -1,4 +1,5 @@
 const transactions = require("../data/transactions.json");
+const { safeDate, safeNumber } = require("../utils/formatter");
 
 /**
  * Returns a UTC date at midnight for consistent range comparisons.
@@ -326,9 +327,51 @@ function comparePeriods(period, unitsBack = 1, dataset = transactions) {
       period: `${previousStart.toISOString().slice(0, 10)} to ${previousEnd.toISOString().slice(0, 10)}`
     },
     deltas,
+    currentTrend: calculateWeeklyTrend(data, 0, latestDate),
+    previousTrend: calculateWeeklyTrend(data, period === 'week' ? 1 : 4, latestDate),
     variances: getCategoryVariances(currentTransactions, previousTransactions),
     narrative: buildComparisonNarrative(current, previous, deltas, period)
   };
+}
+
+
+/**
+ * Helper to group transactions into weekly buckets for the trend graph.
+ * @param {Array<Object>} transactions - List of transaction objects.
+ * @param {number} weekOffset - Number of weeks to shift back (0 for current, 13 for previous).
+ * @param {Date} anchorDate - Relative "now" for the trend.
+ * @returns {{ labels: string[], revenue: number[], expenses: number[] }}
+ */
+function calculateWeeklyTrend(transactions, weekOffset = 0, anchorDate = null) {
+  if (!transactions.length && !anchorDate) return { labels: [], revenue: [], expenses: [] };
+
+  const absoluteLatest = anchorDate || getLatestTransactionDate(transactions);
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const offsetMs = weekOffset * weekMs;
+
+  const latest = new Date(absoluteLatest.getTime() - offsetMs);
+  const trend = { labels: [], revenue: [], expenses: [] };
+
+  for (let i = 12; i >= 0; i--) {
+    const weekEnd = new Date(latest.getTime() - (i * weekMs));
+    const weekStart = new Date(weekEnd.getTime() - weekMs);
+    const weekNum = Math.ceil((weekEnd.getTime() - new Date(weekEnd.getFullYear(), 0, 1).getTime()) / weekMs);
+    
+    trend.labels.push(`W${weekNum}`);
+
+    const weekTransactions = transactions.filter(t => {
+      const d = safeDate(t.date);
+      return d > weekStart && d <= weekEnd;
+    });
+
+    const income = weekTransactions.filter(t => t.type === 'income').reduce((s, t) => s + safeNumber(t.amount), 0);
+    const expense = weekTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + Math.abs(safeNumber(t.amount)), 0);
+
+    trend.revenue.push(income);
+    trend.expenses.push(expense);
+  }
+
+  return trend;
 }
 
 module.exports = {
@@ -341,5 +384,6 @@ module.exports = {
   getTransactionsInRange,
   getCategoryVariances,
   summarizeTransactions,
-  getExpenseTotals
+  getExpenseTotals,
+  calculateWeeklyTrend
 };

@@ -90,6 +90,8 @@ app.post('/api/query', async (req, res) => {
       response: response.content || response,
       intent,
       duel: response.duel || null,
+      trend: response.trend || null,
+      comparisonTrend: response.comparisonTrend || null,
       latencyMs,
       source: activeDataset ? 'User Provided Data' : 'Internal Finance Dataset'
     });
