@@ -213,16 +213,18 @@ function summarizeByCategory(items) {
  * @returns {object} Aggregated metrics.
  */
 function summarizeEntityMetrics(entity, dataset = transactions) {
+  const { safeNumber, safeDate } = require("../utils/formatter");
   const data = dataset || transactions;
-  const norm = entity.toLowerCase();
+  const norm = entity.trim().toLowerCase();
+  
   const matches = data.filter(t => 
     (t.client && t.client.toLowerCase().includes(norm)) ||
     (t.category && t.category.toLowerCase().includes(norm)) ||
     (t.description && t.description.toLowerCase().includes(norm))
   );
 
-  const revenue = matches.filter(t => t.type === 'income' || t.type === 'sales').reduce((s,t) => s + (Number(t.amount) || 0), 0);
-  const costs = matches.filter(t => t.type === 'expense' || t.amount < 0).reduce((s,t) => s + Math.abs(Number(t.amount) || 0), 0);
+  const revenue = matches.filter(t => t.type === 'income' || t.type === 'sales').reduce((s,t) => s + safeNumber(t.amount), 0);
+  const costs = matches.filter(t => t.type === 'expense' || t.amount < 0 || t.type === 'outgo').reduce((s,t) => s + Math.abs(safeNumber(t.amount)), 0);
   const volume = matches.length;
   
   // Growth WoW (Last 7 days vs 7 days before)
@@ -231,8 +233,8 @@ function summarizeEntityMetrics(entity, dataset = transactions) {
   const pEnd = new Date(cStart); pEnd.setUTCDate(pEnd.getUTCDate() - 1);
   const pStart = new Date(pEnd); pStart.setUTCDate(pStart.getUTCDate() - 6);
   
-  const cVolume = matches.filter(t => { const d = parseUtcDate(t.date); return d >= cStart && d <= latest; }).length;
-  const pVolume = matches.filter(t => { const d = parseUtcDate(t.date); return d >= pStart && d <= pEnd; }).length;
+  const cVolume = matches.filter(t => { const d = safeDate(t.date); return d >= cStart && d <= latest; }).length;
+  const pVolume = matches.filter(t => { const d = safeDate(t.date); return d >= pStart && d <= pEnd; }).length;
   
   return {
     revenue,

@@ -8,7 +8,6 @@ const { safeNumber } = require("../utils/formatter");
  * @returns {Object} Forecast components and final projection.
  */
 function calculate30DayForecast(dataset = null) {
-  // Ensure we are working with numbers from the start
   const balance = getCashBalance(dataset);
   const latestDate = getLatestTransactionDate(dataset);
   
@@ -20,11 +19,10 @@ function calculate30DayForecast(dataset = null) {
   const history = getTransactionsInRange(from, latestDate, dataset);
   const totals = summarizeTransactions(history);
   
-  // Guard against division by zero or NaN
-  const safeIncome = safeNumber(totals.income);
-  const safeExpenses = safeNumber(totals.expenses);
-  const avgDailyRevenue = safeIncome / (windowDays || 1);
-  const avgDailyBurn = safeExpenses / (windowDays || 1);
+  const income = safeNumber(totals.income);
+  const expenses = safeNumber(totals.expenses);
+  const avgDailyRevenue = income / (windowDays || 1);
+  const avgDailyBurn = expenses / (windowDays || 1);
   
   // 2. Factored Upcoming Receipts (Next 30 days)
   const upcomingInvoices = getUpcomingDue(30);
@@ -37,22 +35,22 @@ function calculate30DayForecast(dataset = null) {
   const netBalance = safeNumber(balance.netBalance);
   const finalBalance = netBalance + projectedRevenue + upcomingTotal - projectedBurn;
 
-  // Handle pathological cases (e.g. infinite burn due to bad windowing)
-  const finalSafeRevenue = isFinite(projectedRevenue) ? projectedRevenue : 0;
-  const finalSafeBurn = isFinite(projectedBurn) ? projectedBurn : 0;
-  const finalSafeBalance = isFinite(finalBalance) ? finalBalance : netBalance;
+  // Final validation against Infinity/NaN
+  const safeRev = isFinite(projectedRevenue) ? projectedRevenue : 0;
+  const safeBurn = isFinite(projectedBurn) ? projectedBurn : 0;
+  const safeFinal = isFinite(finalBalance) ? finalBalance : netBalance;
 
   return {
     openingBalance: netBalance,
     avgDailyRevenue: Math.round(isFinite(avgDailyRevenue) ? avgDailyRevenue : 0),
     avgDailyBurn: Math.round(isFinite(avgDailyBurn) ? avgDailyBurn : 0),
-    projectedRevenue: Math.round(finalSafeRevenue),
-    projectedBurn: Math.round(finalSafeBurn),
+    projectedRevenue: Math.round(safeRev),
+    projectedBurn: Math.round(safeBurn),
     upcomingTotal: Math.round(upcomingTotal),
-    finalBalance: Math.round(finalSafeBalance),
+    finalBalance: Math.round(safeFinal),
     daysOut: 30,
-    reasoning: `Based on your last ${windowDays} days, your average daily burn is ₹${Math.round(finalSafeBurn / 30).toLocaleString('en-IN')}. ` +
-               `Over the next 30 days, we expect ₹${Math.round(finalSafeRevenue).toLocaleString('en-IN')} in run-rate revenue plus ₹${upcomingTotal.toLocaleString('en-IN')} from specific upcoming invoices.`
+    reasoning: `Based on your last ${windowDays} days, your average daily burn is ₹${Math.round(safeBurn / 30).toLocaleString('en-IN')}. ` +
+               `Over the next 30 days, we expect ₹${Math.round(safeRev).toLocaleString('en-IN')} in run-rate revenue plus ₹${upcomingTotal.toLocaleString('en-IN')} from specific upcoming invoices.`
   };
 }
 

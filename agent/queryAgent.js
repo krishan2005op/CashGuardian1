@@ -606,17 +606,6 @@ async function maybeUseAI(userInput, fallbackText, customDataset = null) {
  * @returns {Promise<string>} Routed response.
  */
 async function handleQuery(userInput, customDataset = null) {
-  // --- GLOBAL SANITIZATION ---
-  // Ensure every row in the custom dataset has numeric amounts and valid dates before any service sees it
-  if (customDataset && Array.isArray(customDataset)) {
-    customDataset = customDataset.map(row => ({
-      ...row,
-      amount: safeNumber(row.amount),
-      date: safeDate(row.date)
-    }));
-  }
-  // ---------------------------
-
   const intent = classifyIntent(userInput);
 
   // If sending a reminder, we should ALWAYS trigger the actual service
@@ -754,8 +743,8 @@ async function handleQuery(userInput, customDataset = null) {
     const normalized = userInput.toLowerCase();
     
     // SMART ROUTING: Determine if this is a month-on-month trend or an entity duel
-    const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "jan", "feb", "mar", "apr"];
-    const isPeriodComparison = months.some(m => normalized.includes(m)) || normalized.includes("month") || normalized.includes("week");
+    const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "jan", "feb", "mar", "apr"];
+    const isPeriodComparison = monthNames.some(m => normalized.includes(m)) || normalized.includes("month") || normalized.includes("week");
 
     if (normalized.includes(" vs ") || normalized.includes(" versus ")) {
       const cleaned = normalized.replace(/.*compare /i, "").replace(/["']/g, "").replace(/\.$/, "");

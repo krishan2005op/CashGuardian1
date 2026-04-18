@@ -91,17 +91,6 @@ async function executeNode(state) {
   const { intent, lastClient, activeDataset, messages } = state;
   const userInput = messages[messages.length - 1].content;
 
-  // --- GLOBAL SANITIZATION ---
-  let cleanedDataset = activeDataset;
-  if (activeDataset && Array.isArray(activeDataset)) {
-    cleanedDataset = activeDataset.map(row => ({
-      ...row,
-      amount: safeNumber(row.amount),
-      date: safeDate(row.date)
-    }));
-  }
-  // ---------------------------
-
   // 1. High-Priority Action: Send Reminder
   if (intent === INTENTS.SEND_REMINDER) {
     if (!lastClient) return { response: "Please specify which client should receive the reminder." };
@@ -183,7 +172,7 @@ async function executeNode(state) {
   // 4. Prediction Mode
   if (intent === INTENTS.PREDICTION) {
     const { calculate30DayForecast } = require("../services/predictionService");
-    const forecast = calculate30DayForecast(cleanedDataset);
+    const forecast = calculate30DayForecast(activeDataset);
 
     const systemPrompt = buildSystemPrompt(snapshot) +
       `\n\n### MANDATORY DATA SOURCE: 30-DAY FORECAST\n` +
@@ -208,13 +197,11 @@ async function executeNode(state) {
   }
 
   // 4. Fallback to AI Reasoning (Passing history for conversational awareness)
-
-  // 4. Fallback to AI Reasoning (Passing history for conversational awareness)
   const normalized = userInput.toLowerCase();
   
   // SMART ROUTING: Determine if this is a month-on-month trend or an entity duel
-  const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "jan", "feb", "mar", "apr"];
-  const isPeriodComparison = months.some(m => normalized.includes(m)) || normalized.includes("month") || normalized.includes("week");
+  const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "jan", "feb", "mar", "apr"];
+  const isPeriodComparison = monthNames.some(m => normalized.includes(m)) || normalized.includes("month") || normalized.includes("week");
 
   // Robust pattern: match anything "vs" or "versus" anything, cleaning common noise
   if (intent === INTENTS.COMPARE && (normalized.includes(" vs ") || normalized.includes(" versus "))) {
@@ -227,14 +214,14 @@ async function executeNode(state) {
     if (isPeriodComparison) {
       const { comparePeriods } = require("../services/cashFlowService");
       const period = normalized.includes("week") ? "week" : "month";
-      snapshot.periodComparison = comparePeriods(period, 1, cleanedDataset);
+      snapshot.periodComparison = comparePeriods(period, 1, activeDataset);
     } else {
       const parts = cleanInput.split(/ vs | versus /);
       if (parts.length >= 2) {
         const entityA = parts[0].trim();
         const entityB = parts[1].trim();
         const { compareEntities } = require("../services/cashFlowService");
-        snapshot.duel = compareEntities(entityA, entityB, cleanedDataset);
+        snapshot.duel = compareEntities(entityA, entityB, activeDataset);
         console.log(`[LangGraph] Duel detected: ${entityA} vs ${entityB}`);
       }
     }
