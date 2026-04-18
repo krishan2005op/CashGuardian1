@@ -479,7 +479,7 @@
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 const displayQuery = query.length > 35 ? query.substring(0, 32) + '...' : query;
-                item.innerHTML = `<div>${displayQuery}</div><span class="history-time">Recent Intelligence 🧠</span>`;
+                item.innerHTML = `<div>${displayQuery}</div><span class="history-time">Recent Intelligence </span>`;
                 item.onclick = () => {
                     document.getElementById('query-input').value = query;
                     sendQuery(query);
@@ -706,17 +706,37 @@
             });
 
             const ctxDuel = document.getElementById('duelChart').getContext('2d');
+            // duelChart = new Chart(ctxDuel, {
+            //     type: 'bar',
+            //     data: { labels: [], datasets: [] },
+            //     options: {
+            //         indexAxis: 'y',
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //         plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+            //         scales: { x: { beginAtZero: true } }
+            //     }
+            // });
             duelChart = new Chart(ctxDuel, {
-                type: 'bar',
-                data: { labels: [], datasets: [] },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
-                    scales: { x: { beginAtZero: true } }
-                }
-            });
+    type: 'bar',
+    data: { labels: [], datasets: [] },
+    options: {
+        indexAxis: 'x',          // or remove this line entirely
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: { boxWidth: 12, font: { size: 11 } }
+            }
+        },
+        scales: {
+            x: { beginAtZero: true },
+            y: { ticks: { autoSkip: false } }
+        }
+    }
+});
         }
 
         document.getElementById('file-input').addEventListener('change', async (e) => {
