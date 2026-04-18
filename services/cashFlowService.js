@@ -346,13 +346,20 @@ function calculateWeeklyTrend(transactions, weekOffset = 0, anchorDate = null) {
   if (!transactions.length && !anchorDate) return { labels: [], revenue: [], expenses: [] };
 
   const absoluteLatest = anchorDate || getLatestTransactionDate(transactions);
+  const earliestInData = transactions.length > 0 ? new Date(Math.min(...transactions.map(t => safeDate(t.date)))) : absoluteLatest;
+  
   const weekMs = 7 * 24 * 60 * 60 * 1000;
   const offsetMs = weekOffset * weekMs;
-
   const latest = new Date(absoluteLatest.getTime() - offsetMs);
+
+  // Calculate dynamic history length (capped at 13 weeks, floored at 4 for stability)
+  const diffMs = absoluteLatest.getTime() - earliestInData.getTime();
+  const calculatedWeeks = Math.ceil(diffMs / weekMs);
+  const loopCount = Math.max(4, Math.min(calculatedWeeks + 1, 13));
+
   const trend = { labels: [], revenue: [], expenses: [] };
 
-  for (let i = 12; i >= 0; i--) {
+  for (let i = loopCount - 1; i >= 0; i--) {
     const weekEnd = new Date(latest.getTime() - (i * weekMs));
     const weekStart = new Date(weekEnd.getTime() - weekMs);
     const weekNum = Math.ceil((weekEnd.getTime() - new Date(weekEnd.getFullYear(), 0, 1).getTime()) / weekMs);
