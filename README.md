@@ -238,10 +238,11 @@ Highest exposure: Sharma Retail — ₹96,000
 |---|---|
 | Runtime | Node.js 18+ |
 | CLI | readline |
-| Backend | Express |
+| Backend | Express / CORS |
 | Frontend | Vanilla HTML / CSS / JS |
 | Charts | Chart.js |
-| AI | Gemini / Groq / OpenRouter |
+| AI Models | Gemini / Groq / OpenRouter |
+| AI Agent | LangChain / LangGraph |
 | Dates | date-fns |
 | Email | Nodemailer |
 | Config | dotenv |
