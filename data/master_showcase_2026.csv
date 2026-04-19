@@ -1,156 +1,154 @@
-id,date,type,amount,category,description,client,region,channel,status,dueDate
-TXN1000,2026-01-01,income,274555.38,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,
-TXN1001,2026-01-04,income,53573.23,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,
-TXN1002,2026-01-06,income,100000.00,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,
-TXN1003,2026-01-11,income,48707.34,sales,Retail supplies,Alpha Supplies,East,Retail,paid,
-TXN1004,2026-01-16,income,57803.74,sales,Bulk retail order,Sharma Retail,West,Retail,paid,
-TXN1005,2026-01-26,income,24610.20,sales,Online store orders,Global Exports Ltd,All,Digital,paid,
-TXN1006,2026-01-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,
-TXN1007,2026-01-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,
-TXN1008,2026-01-13,expense,16637.23,logistics,Local shipping,BlueDart,All,Retail,paid,
-TXN1009,2026-01-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,
-TXN1010,2026-01-01,expense,2445.35,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1011,2026-01-04,expense,919.16,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1012,2026-01-05,income,1974.75,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1013,2026-01-06,income,2417.73,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1014,2026-01-08,income,1118.40,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1015,2026-01-10,income,3139.33,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1016,2026-01-11,expense,3107.22,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1017,2026-01-12,expense,2399.14,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1018,2026-01-16,expense,2306.85,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1019,2026-01-17,expense,2382.16,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1020,2026-01-19,expense,1107.64,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1021,2026-01-20,expense,4459.25,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1022,2026-01-22,income,2599.87,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1023,2026-01-26,income,1474.28,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1024,2026-01-29,expense,45.62,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1025,2026-01-31,expense,3202.95,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1026,2026-02-01,income,267639.20,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,
-TXN1027,2026-02-04,income,50239.78,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,
-TXN1028,2026-02-06,income,105000.00,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,
-TXN1029,2026-02-11,income,49194.28,sales,Retail supplies,Alpha Supplies,East,Retail,paid,
-TXN1030,2026-02-16,income,59907.28,sales,Bulk retail order,Sharma Retail,West,Retail,paid,
-TXN1031,2026-02-26,income,23879.51,sales,Online store orders,Global Exports Ltd,All,Digital,paid,
-TXN1032,2026-02-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,
-TXN1033,2026-03-01,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,
-TXN1034,2026-02-13,expense,19130.56,logistics,Local shipping,BlueDart,All,Retail,paid,
-TXN1035,2026-02-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,
-TXN1036,2026-02-05,expense,4784.18,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1037,2026-02-08,expense,4215.17,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1038,2026-02-10,expense,4139.63,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1039,2026-02-12,expense,1309.09,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1040,2026-02-13,income,4680.03,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1041,2026-02-14,income,3333.15,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1042,2026-02-20,income,4802.74,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1043,2026-02-21,expense,4289.41,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1044,2026-02-24,expense,3702.41,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1045,2026-02-26,expense,3427.19,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1046,2026-02-28,expense,3276.25,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1047,2026-03-01,income,260775.77,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,
-TXN1048,2026-03-04,income,54626.76,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,
-TXN1049,2026-03-06,income,110250.00,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,
-TXN1050,2026-03-11,income,51256.65,sales,Retail supplies,Alpha Supplies,East,Retail,paid,
-TXN1051,2026-03-16,income,57326.52,sales,Bulk retail order,Sharma Retail,West,Retail,paid,
-TXN1052,2026-03-26,income,20894.85,sales,Online store orders,Global Exports Ltd,All,Digital,paid,
-TXN1053,2026-03-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,
-TXN1054,2026-03-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,
-TXN1055,2026-03-13,expense,18727.22,logistics,Local shipping,BlueDart,All,Retail,paid,
-TXN1056,2026-03-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,
-TXN1057,2026-03-01,expense,4112.43,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1058,2026-03-05,expense,2923.02,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1059,2026-03-06,income,3479.72,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1060,2026-03-07,income,916.27,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1061,2026-03-09,income,1311.00,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1062,2026-03-11,income,2936.35,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1063,2026-03-13,expense,4585.60,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1064,2026-03-14,income,2628.63,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1065,2026-03-16,expense,4119.60,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1066,2026-03-17,income,3772.44,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1067,2026-03-19,income,1423.91,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1068,2026-03-20,expense,2930.01,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1069,2026-03-22,expense,2051.05,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1070,2026-03-24,income,1274.50,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1071,2026-03-26,expense,738.73,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1072,2026-03-29,expense,93.64,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1073,2026-04-01,income,262049.25,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,
-TXN1074,2026-04-04,income,46964.28,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,
-TXN1075,2026-04-06,income,115762.50,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,
-TXN1076,2026-04-11,income,46331.38,sales,Retail supplies,Alpha Supplies,East,Retail,paid,
-TXN1077,2026-04-16,income,55256.87,sales,Bulk retail order,Sharma Retail,West,Retail,paid,
-TXN1078,2026-04-26,income,24327.82,sales,Online store orders,Global Exports Ltd,All,Digital,paid,
-TXN1079,2026-04-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,
-TXN1080,2026-04-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,
-TXN1081,2026-04-13,expense,18343.53,logistics,Local shipping,BlueDart,All,Retail,paid,
-TXN1082,2026-04-15,expense,150000.00,marketing,Digital Ad Campaign - Q2 Blitz,Google Ads,All,Digital,paid,
-TXN1083,2026-04-01,expense,1972.76,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1084,2026-04-03,expense,3390.82,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1085,2026-04-04,expense,839.04,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1086,2026-04-05,income,1413.40,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1087,2026-04-07,expense,1934.59,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1088,2026-04-08,expense,3671.43,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1089,2026-04-10,expense,1607.42,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1090,2026-04-14,expense,1990.69,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1091,2026-04-15,expense,2862.05,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1092,2026-04-16,expense,3291.36,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1093,2026-04-18,expense,3753.11,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1094,2026-04-19,expense,2058.36,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1095,2026-04-20,expense,1604.92,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1096,2026-04-22,expense,587.10,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1097,2026-04-23,expense,3188.53,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1098,2026-04-25,income,1857.05,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1099,2026-04-26,income,4867.33,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1100,2026-04-27,expense,189.24,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1101,2026-04-30,expense,180.35,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1102,2026-05-01,income,271197.03,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,
-TXN1103,2026-05-04,income,49371.47,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,
-TXN1104,2026-05-06,income,121550.63,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,
-TXN1105,2026-05-11,income,49672.98,sales,Retail supplies,Alpha Supplies,East,Retail,paid,
-TXN1106,2026-05-16,income,59933.88,sales,Bulk retail order,Sharma Retail,West,Retail,paid,
-TXN1107,2026-05-26,income,85000.00,sales,Online store orders,Global Exports Ltd,All,Digital,paid,
-TXN1108,2026-05-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,
-TXN1109,2026-05-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,
-TXN1110,2026-05-13,expense,18734.85,logistics,Local shipping,BlueDart,All,Retail,paid,
-TXN1111,2026-05-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,
-TXN1112,2026-05-02,expense,906.66,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1113,2026-05-03,expense,3226.39,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1114,2026-05-04,income,2301.84,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1115,2026-05-05,income,3469.77,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1116,2026-05-07,expense,584.35,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1117,2026-05-08,expense,4399.30,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1118,2026-05-09,expense,4620.55,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1119,2026-05-10,expense,2172.70,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1120,2026-05-12,income,4892.25,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1121,2026-05-14,expense,2413.86,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1122,2026-05-17,expense,4802.93,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1123,2026-05-18,expense,4927.84,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1124,2026-05-20,income,3763.81,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1125,2026-05-25,expense,4987.67,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1126,2026-05-29,income,17.69,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1127,2026-05-30,income,862.07,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1128,2026-05-31,expense,1587.61,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1129,2026-06-01,income,90000.00,sales,Wholesale delivery - supply chain shortage,Sigma Traders,North,Wholesale,paid,
-TXN1130,2026-06-04,income,51578.72,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,
-TXN1131,2026-06-06,income,127628.16,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,
-TXN1132,2026-06-11,income,45367.25,sales,Retail supplies,Alpha Supplies,East,Retail,paid,
-TXN1133,2026-06-16,income,59643.85,sales,Bulk retail order,Sharma Retail,West,Retail,overdue,2026-07-01
-TXN1134,2026-06-21,income,69643.85,sales,Seasonal stock,Sharma Retail,West,Retail,overdue,2026-07-06
-TXN1135,2026-06-26,income,110000.00,sales,Online store orders,Global Exports Ltd,All,Digital,paid,
-TXN1136,2026-06-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,
-TXN1137,2026-06-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,
-TXN1138,2026-06-13,expense,16360.91,logistics,Local shipping,BlueDart,All,Retail,paid,
-TXN1139,2026-06-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,
-TXN1140,2026-06-01,expense,4827.59,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1141,2026-06-02,income,1600.97,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1142,2026-06-05,expense,2931.47,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1143,2026-06-06,income,2926.90,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1144,2026-06-11,expense,3952.00,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1145,2026-06-12,expense,4348.63,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1146,2026-06-16,expense,2646.62,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1147,2026-06-17,expense,1739.91,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1148,2026-06-18,income,2263.22,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1149,2026-06-19,expense,1796.87,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1150,2026-06-21,income,374.62,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1151,2026-06-23,income,3186.55,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1152,2026-06-26,income,933.60,sales,Daily transaction,Walk-in Client,North,Retail,paid,
-TXN1153,2026-06-29,expense,3981.01,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
-TXN1154,2026-06-30,expense,3034.81,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,
+id,date,type,amount,category,description,client,region,channel,status,dueDate,email
+TXN1000,2026-01-01,income,284030.20,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,,sigma.contact@example.com
+TXN1001,2026-01-04,income,53681.04,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,,sigma.contact@example.com
+TXN1002,2026-01-06,income,100000.00,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,,beta.ops@example.com
+TXN1003,2026-01-11,income,51192.26,sales,Retail supplies,Alpha Supplies,East,Retail,paid,,alpha.trading@example.com
+TXN1004,2026-01-16,income,58276.10,sales,Bulk retail order,Sharma Retail,West,Retail,paid,,nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com
+TXN1005,2026-01-26,income,24361.37,sales,Online store orders,Global Exports Ltd,All,Digital,paid,,global.support@example.com
+TXN1006,2026-01-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,,contact@example.com
+TXN1007,2026-01-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,,contact@example.com
+TXN1008,2026-01-13,expense,15775.30,logistics,Local shipping,BlueDart,All,Retail,paid,,contact@example.com
+TXN1009,2026-01-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,,contact@example.com
+TXN1010,2026-01-01,expense,2682.25,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1011,2026-01-04,income,1893.02,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1012,2026-01-06,expense,2230.59,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1013,2026-01-09,income,2982.82,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1014,2026-01-10,income,5.06,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1015,2026-01-12,income,2325.19,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1016,2026-01-14,expense,1795.96,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1017,2026-01-15,expense,1293.94,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1018,2026-01-19,expense,1061.23,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1019,2026-01-23,income,4364.59,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1020,2026-01-25,income,2224.64,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1021,2026-01-26,income,1841.77,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1022,2026-01-29,expense,3777.50,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1023,2026-01-31,expense,1964.98,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1024,2026-02-01,income,288507.11,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,,sigma.contact@example.com
+TXN1025,2026-02-04,income,45857.05,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,,sigma.contact@example.com
+TXN1026,2026-02-06,income,105000.00,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,,beta.ops@example.com
+TXN1027,2026-02-11,income,51669.43,sales,Retail supplies,Alpha Supplies,East,Retail,paid,,alpha.trading@example.com
+TXN1028,2026-02-16,income,59877.18,sales,Bulk retail order,Sharma Retail,West,Retail,paid,,nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com
+TXN1029,2026-02-26,income,22704.06,sales,Online store orders,Global Exports Ltd,All,Digital,paid,,global.support@example.com
+TXN1030,2026-02-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,,contact@example.com
+TXN1031,2026-03-01,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,,contact@example.com
+TXN1032,2026-02-13,expense,19898.20,logistics,Local shipping,BlueDart,All,Retail,paid,,contact@example.com
+TXN1033,2026-02-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,,contact@example.com
+TXN1034,2026-02-03,expense,3339.69,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1035,2026-02-04,income,3196.56,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1036,2026-02-06,expense,4922.71,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1037,2026-02-09,income,651.64,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1038,2026-02-10,expense,3486.88,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1039,2026-02-11,expense,1872.65,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1040,2026-02-12,expense,1735.31,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1041,2026-02-15,income,2223.11,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1042,2026-02-18,expense,958.03,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1043,2026-02-19,expense,3370.71,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1044,2026-02-21,expense,3286.67,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1045,2026-02-22,expense,2282.94,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1046,2026-02-24,expense,4143.43,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1047,2026-03-01,income,268127.88,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,,sigma.contact@example.com
+TXN1048,2026-03-04,income,51411.98,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,,sigma.contact@example.com
+TXN1049,2026-03-06,income,110250.00,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,,beta.ops@example.com
+TXN1050,2026-03-11,income,45015.62,sales,Retail supplies,Alpha Supplies,East,Retail,paid,,alpha.trading@example.com
+TXN1051,2026-03-16,income,58090.36,sales,Bulk retail order,Sharma Retail,West,Retail,paid,,nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com
+TXN1052,2026-03-26,income,24506.05,sales,Online store orders,Global Exports Ltd,All,Digital,paid,,global.support@example.com
+TXN1053,2026-03-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,,contact@example.com
+TXN1054,2026-03-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,,contact@example.com
+TXN1055,2026-03-13,expense,15167.94,logistics,Local shipping,BlueDart,All,Retail,paid,,contact@example.com
+TXN1056,2026-03-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,,contact@example.com
+TXN1057,2026-03-02,income,3398.09,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1058,2026-03-04,expense,3283.41,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1059,2026-03-06,expense,2601.66,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1060,2026-03-07,income,459.36,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1061,2026-03-09,income,210.99,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1062,2026-03-12,expense,1671.24,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1063,2026-03-15,expense,3705.12,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1064,2026-03-16,expense,3004.68,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1065,2026-03-17,expense,467.45,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1066,2026-03-18,income,1476.52,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1067,2026-03-22,income,1624.78,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1068,2026-03-25,expense,31.39,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1069,2026-03-26,expense,418.10,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1070,2026-03-27,expense,408.91,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1071,2026-03-28,income,3479.56,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1072,2026-03-30,expense,3489.37,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1073,2026-04-01,income,284127.74,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,,sigma.contact@example.com
+TXN1074,2026-04-04,income,49743.45,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,,sigma.contact@example.com
+TXN1075,2026-04-06,income,115762.50,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,,beta.ops@example.com
+TXN1076,2026-04-11,income,45866.83,sales,Retail supplies,Alpha Supplies,East,Retail,paid,,alpha.trading@example.com
+TXN1077,2026-04-16,income,57875.79,sales,Bulk retail order,Sharma Retail,West,Retail,paid,,nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com
+TXN1078,2026-04-26,income,22116.80,sales,Online store orders,Global Exports Ltd,All,Digital,paid,,global.support@example.com
+TXN1079,2026-04-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,,contact@example.com
+TXN1080,2026-04-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,,contact@example.com
+TXN1081,2026-04-13,expense,15669.15,logistics,Local shipping,BlueDart,All,Retail,paid,,contact@example.com
+TXN1082,2026-04-15,expense,150000.00,marketing,Digital Ad Campaign - Q2 Blitz,Google Ads,All,Digital,paid,,contact@example.com
+TXN1083,2026-04-04,expense,406.07,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1084,2026-04-06,expense,4572.29,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1085,2026-04-08,expense,2378.15,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1086,2026-04-09,expense,2128.67,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1087,2026-04-10,expense,3565.62,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1088,2026-04-12,expense,2825.72,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1089,2026-04-13,income,4525.84,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1090,2026-04-17,expense,4260.92,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1091,2026-04-18,expense,2091.25,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1092,2026-04-19,expense,3116.23,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1093,2026-04-21,expense,1477.34,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1094,2026-04-24,income,2100.51,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1095,2026-04-28,expense,4620.99,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1096,2026-05-01,income,289587.78,sales,Monthly wholesale distribution,Sigma Traders,North,Wholesale,paid,,sigma.contact@example.com
+TXN1097,2026-05-04,income,49235.25,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,,sigma.contact@example.com
+TXN1098,2026-05-06,income,121550.63,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,,beta.ops@example.com
+TXN1099,2026-05-11,income,54909.01,sales,Retail supplies,Alpha Supplies,East,Retail,paid,,alpha.trading@example.com
+TXN1100,2026-05-16,income,55251.22,sales,Bulk retail order,Sharma Retail,West,Retail,paid,,nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com
+TXN1101,2026-05-26,income,85000.00,sales,Online store orders,Global Exports Ltd,All,Digital,paid,,global.support@example.com
+TXN1102,2026-05-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,,contact@example.com
+TXN1103,2026-05-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,,contact@example.com
+TXN1104,2026-05-13,expense,17874.15,logistics,Local shipping,BlueDart,All,Retail,paid,,contact@example.com
+TXN1105,2026-05-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,,contact@example.com
+TXN1106,2026-05-01,income,704.97,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1107,2026-05-02,income,1999.84,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1108,2026-05-03,expense,772.78,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1109,2026-05-04,expense,3709.21,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1110,2026-05-05,expense,3932.48,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1111,2026-05-09,expense,2974.40,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1112,2026-05-10,income,1806.47,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1113,2026-05-12,income,11.31,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1114,2026-05-13,income,4878.09,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1115,2026-05-15,expense,2291.89,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1116,2026-05-16,expense,2208.61,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1117,2026-05-19,expense,3326.18,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1118,2026-05-21,expense,4855.74,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1119,2026-05-23,expense,2383.92,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1120,2026-05-24,income,1822.73,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1121,2026-05-25,expense,1401.01,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1122,2026-05-26,income,3046.20,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1123,2026-05-27,income,4535.24,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1124,2026-05-29,expense,3426.92,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1125,2026-05-30,expense,3008.14,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1126,2026-06-01,income,90000.00,sales,Wholesale delivery - supply chain shortage,Sigma Traders,North,Wholesale,paid,,sigma.contact@example.com
+TXN1127,2026-06-04,income,46133.00,consulting,Quarterly supply-chain advisory,Sigma Traders,North,Export,paid,,sigma.contact@example.com
+TXN1128,2026-06-06,income,127628.16,sales,Logistics hub revenue,Beta Logistics,South,Wholesale,paid,,beta.ops@example.com
+TXN1129,2026-06-11,income,49158.64,sales,Retail supplies,Alpha Supplies,East,Retail,paid,,alpha.trading@example.com
+TXN1130,2026-06-16,income,57764.66,sales,Bulk retail order,Sharma Retail,West,Retail,overdue,2026-07-01,nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com
+TXN1131,2026-06-21,income,67764.66,sales,Seasonal stock,Sharma Retail,West,Retail,overdue,2026-07-06,nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com
+TXN1132,2026-06-26,income,110000.00,sales,Online store orders,Global Exports Ltd,All,Digital,paid,,global.support@example.com
+TXN1133,2026-06-03,expense,45000.00,rent,HQ Rent,Mehta Realty,North,Internal,paid,,contact@example.com
+TXN1134,2026-06-29,expense,120000.00,salaries,Staff Payroll,Multiple,All,Internal,paid,,contact@example.com
+TXN1135,2026-06-13,expense,16133.47,logistics,Local shipping,BlueDart,All,Retail,paid,,contact@example.com
+TXN1136,2026-06-15,expense,15000.00,marketing,Social media management,Ad Agency,All,Digital,paid,,contact@example.com
+TXN1137,2026-06-02,expense,837.61,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1138,2026-06-04,income,1410.50,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1139,2026-06-05,expense,453.13,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1140,2026-06-07,expense,1140.56,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1141,2026-06-10,expense,1066.32,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1142,2026-06-11,expense,3968.20,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1143,2026-06-12,income,4544.02,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a
+TXN1144,2026-06-13,expense,3327.08,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1145,2026-06-15,expense,1686.69,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1146,2026-06-17,expense,4687.66,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1147,2026-06-18,expense,975.35,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1148,2026-06-21,expense,2102.27,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1149,2026-06-23,expense,4570.06,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1150,2026-06-26,expense,4078.63,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1151,2026-06-27,expense,3024.45,utilities,Miscellaneous office cost,Utility Corp,North,Internal,paid,,contact@example.com
+TXN1152,2026-06-30,income,1435.25,sales,Daily transaction,Walk-in Client,North,Retail,paid,,n/a

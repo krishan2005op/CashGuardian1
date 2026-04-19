@@ -12,7 +12,16 @@ if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
 const outputFile = path.join(outputDir, 'master_showcase_2026.csv');
 
-const HEADERS = 'id,date,type,amount,category,description,client,region,channel,status,dueDate';
+const HEADERS = 'id,date,type,amount,category,description,client,region,channel,status,dueDate,email';
+
+const CLIENT_EMAILS = {
+  'Sharma Retail': 'nandan.nv358@gmail.com, krishanmalhotra2005@gmail.com',
+  'Sigma Traders': 'sigma.contact@example.com',
+  'Beta Logistics': 'beta.ops@example.com',
+  'Alpha Supplies': 'alpha.trading@example.com',
+  'Global Exports Ltd': 'global.support@example.com',
+  'Walk-in Client': 'n/a'
+};
 
 const CLIENTS = [
   'Sigma Traders',      // Reliable, North, Wholesale
@@ -31,7 +40,8 @@ let txnId = 1000;
 
 function createTxn(date, type, amount, category, description, client, region, channel, status = 'paid', dueDate = '') {
   const id = `TXN${txnId++}`;
-  return `${id},${format(date, 'yyyy-MM-dd')},${type},${amount.toFixed(2)},${category},${description},${client},${region},${channel},${status},${dueDate}`;
+  const email = CLIENT_EMAILS[client] || 'contact@example.com';
+  return `${id},${format(date, 'yyyy-MM-dd')},${type},${amount.toFixed(2)},${category},${description},${client},${region},${channel},${status},${dueDate},${email}`;
 }
 
 // --------------------------------------------------------------------------------
