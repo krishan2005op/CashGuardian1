@@ -38,6 +38,16 @@ function buildSystemPrompt(snapshot) {
   const validationNotes = snapshot.externalValidationNotes.map((line) => `- ${line}`).join("\n");
   const anomalies = (snapshot.anomalies || []).map((a) => `- CRITICAL: ${a.explanation}`).join("\n");
   const variances = snapshot.variances;
+  
+  let duelSection = "";
+  if (snapshot.duel) {
+    const { entityA, entityB, analysis } = snapshot.duel;
+    duelSection = `\n=== PERFORMANCE DUEL GROUNDING (Long-Term Head-to-Head) ===\n` +
+      `Entity A [${entityA.name}]: Revenue ₹${entityA.revenue.toLocaleString()}, Costs ₹${entityA.costs.toLocaleString()}, Volume ${entityA.volume}\n` +
+      `Entity B [${entityB.name}]: Revenue ₹${entityB.revenue.toLocaleString()}, Costs ₹${entityB.costs.toLocaleString()}, Volume ${entityB.volume}\n` +
+      `Calculated Gap: ${analysis.gapPct}% revenue lead for ${analysis.leader}\n` +
+      `============================================================\n`;
+  }
 
   let popSection = "No comparison data available.";
   if (variances && variances.income) {
@@ -72,7 +82,7 @@ ${popSection}
 === IDENTIFIED ANOMALIES & ALERTS ===
 ${anomalies || "No critical anomalies detected in recent spending patterns."}
 =====================================
-
+${duelSection}
 === EXTERNAL VALIDATION REFERENCES ===
 ${validationNotes}
 =====================================
@@ -92,7 +102,9 @@ ${JSON.stringify((snapshot.overdueList || []).slice(0, 3), null, 2)}
 Rules:
 - Format money as ₹X,XX,XXX (Indian style).
 - Use Markdown headings (####) for structure.
-- Always identify the source of your information (e.g., "According to recent transaction logs...").
+- **Narrative Consistency**: If a PERFORMANCE DUEL GROUNDING section is present, prioritize its long-term totals (Entity A vs Entity B) over short-term "Transaction Drivers".
+- **Communication Style**: Do NOT mention the names of the source sections (e.g., avoid "According to the TOP TRANSACTION DRIVERS..."). Instead, use phrases like "Our historical data shows..." or "Based on current performance...".
+- Always identify the general source of your information (e.g., "According to recent transaction logs...").
 ---
 `;
 }
