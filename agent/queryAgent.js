@@ -13,6 +13,7 @@ const {
   getLatestTransactionDate,
   getTransactionsInRange,
   getCategoryVariances,
+  summarizeTransactions,
   calculateWeeklyTrend
 } = require("../services/cashFlowService");
 const {
@@ -36,7 +37,15 @@ const { formatCurrency, safeDate, safeNumber } = require("../utils/formatter");
 function buildSystemPrompt(snapshot) {
   const validationNotes = snapshot.externalValidationNotes.map((line) => `- ${line}`).join("\n");
   const anomalies = (snapshot.anomalies || []).map((a) => `- CRITICAL: ${a.explanation}`).join("\n");
-  
+  const variances = snapshot.variances;
+
+  let popSection = "No comparison data available.";
+  if (variances && variances.income) {
+    popSection = `Current Block (30d): Income ₹${variances.income.current.toLocaleString()}, Expenses ₹${variances.expenses.current.toLocaleString()}
+Previous Block (30d): Income ₹${variances.income.previous.toLocaleString()}, Expenses ₹${variances.expenses.previous.toLocaleString()}
+Deltas: Income ${variances.income.delta >= 0 ? '+' : ''}${variances.income.delta.toLocaleString()} (${variances.income.pct}%), Expenses ${variances.expenses.delta >= 0 ? '+' : ''}${variances.expenses.delta.toLocaleString()} (${variances.expenses.pct}%)`;
+  }
+
   return `You are CashGuardian, an advanced financial reasoning agent.
 Today is ${new Date().toDateString()}.
 
@@ -53,6 +62,10 @@ Overdue Invoices:      ${snapshot.overdueCount} invoices worth ₹${snapshot.ove
 High-Risk Clients:     ${snapshot.highRiskClients.join(", ")}
 Top Expense Category:  ${snapshot.topExpenseCategory}
 ===========================
+
+=== PERIOD-ON-PERIOD PERFORMANCE (Last 30d vs Prior 30d) ===
+${popSection}
+===========================================================
 
 === IDENTIFIED ANOMALIES & ALERTS ===
 ${anomalies || "No critical anomalies detected in recent spending patterns."}
@@ -216,7 +229,25 @@ function getSnapshot(customDataset = null) {
 
     const currentInterval = getTransactionsInRange(midPoint, latestDate, cleanedData);
     const prevInterval = getTransactionsInRange(startPoint, midPoint, cleanedData);
-    const variances = getCategoryVariances(currentInterval, prevInterval);
+    
+    const currentSummary = summarizeTransactions(currentInterval);
+    const prevSummary = summarizeTransactions(prevInterval);
+    
+    const variances = {
+      income: {
+        current: currentSummary.income,
+        previous: prevSummary.income,
+        delta: currentSummary.income - prevSummary.income,
+        pct: prevSummary.income !== 0 ? Math.round(((currentSummary.income - prevSummary.income) / prevSummary.income) * 100) : 0
+      },
+      expenses: {
+        current: currentSummary.expenses,
+        previous: prevSummary.expenses,
+        delta: currentSummary.expenses - prevSummary.expenses,
+        pct: prevSummary.expenses !== 0 ? Math.round(((currentSummary.expenses - prevSummary.expenses) / prevSummary.expenses) * 100) : 0
+      },
+      categories: getCategoryVariances(currentInterval, prevInterval)
+    };
 
     const { detectAnomalies } = require("../services/anomalyService");
     const activeAnomalies = detectAnomalies(cleanedData);
@@ -286,6 +317,7 @@ function getSnapshot(customDataset = null) {
     // Pull last 13 weeks and the 13 before that for comparison
     const recentMetrics = metrics.slice(-13);
     const previousMetrics = metrics.slice(-26, -13);
+    const comparison = comparePeriods("month", 1);
 
     snapshot = {
       netBalance: balance.netBalance,
@@ -309,7 +341,21 @@ function getSnapshot(customDataset = null) {
         expenses: previousMetrics.map(m => m.expenses)
       } : null,
       breakdown: expenseBreakdown.map(b => ({ category: b.category, total: b.total })),
-      variances: comparePeriods("month").variances,
+      variances: {
+        income: {
+          current: comparison.current.income,
+          previous: comparison.previous.income,
+          delta: comparison.deltas.income,
+          pct: Math.round((comparison.deltas.income / (comparison.previous.income || 1)) * 100)
+        },
+        expenses: {
+          current: comparison.current.expenses,
+          previous: comparison.previous.expenses,
+          delta: comparison.deltas.expenses,
+          pct: Math.round((comparison.deltas.expenses / (comparison.previous.expenses || 1)) * 100)
+        },
+        categories: comparison.variances
+      },
       anomalies: detectAnomalies(), // ADDED: Critical for grounding spending queries
       overdueList: overdueInvoices.map(i => ({
         client: i.client,
