@@ -42,7 +42,7 @@ function buildSystemPrompt(snapshot) {
   let duelSection = "";
   if (snapshot.duel) {
     const { entityA, entityB, analysis } = snapshot.duel;
-    duelSection = `\n=== PERFORMANCE DUEL GROUNDING (Long-Term Head-to-Head) ===\n` +
+    duelSection = `\n=== PERFORMANCE DUEL GROUNDING (H2H - Last 90 Days) ===\n` +
       `Entity A [${entityA.name}]: Revenue ₹${entityA.revenue.toLocaleString()}, Costs ₹${entityA.costs.toLocaleString()}, Volume ${entityA.volume}\n` +
       `Entity B [${entityB.name}]: Revenue ₹${entityB.revenue.toLocaleString()}, Costs ₹${entityB.costs.toLocaleString()}, Volume ${entityB.volume}\n` +
       `Calculated Gap: ${analysis.gapPct}% revenue lead for ${analysis.leader}\n` +
@@ -423,6 +423,21 @@ function formatOverdueInvoices(overdueInvoices) {
 }
 
 /**
+ * Formats overdue invoices into a professional markdown table.
+ * @param {Array<Object>} overdueInvoices 
+ * @returns {string} Markdown table.
+ */
+function formatOverdueTable(overdueInvoices) {
+    if (!overdueInvoices || overdueInvoices.length === 0) return "No overdue invoices found.";
+    
+    let table = "| Client | Amount | Due Date | Status |\n|---|---|---|---|\n";
+    overdueInvoices.forEach(inv => {
+        table += `| ${inv.client} | ${formatCurrency(inv.amount)} | ${inv.dueDate || inv.date || 'N/A'} | ${inv.status || 'overdue'} |\n`;
+    });
+    return table;
+}
+
+/**
  * Formats expense breakdown rows.
  * @param {Array<{ category: string, total: number, percentage: string }>} breakdown
  * @returns {string} Breakdown text.
@@ -460,18 +475,18 @@ function formatAnomalies(anomalies) {
 }
 
 /**
- * Formats decomposition results into a tabular string.
+ * Formats decomposition results into a professional markdown table.
  * @param {object} result - Raw decomposition data.
- * @returns {string} Tabular output.
+ * @returns {string} Markdown table.
  */
 function formatDecompositionTable(result) {
-  const { printTable } = require("../utils/formatter");
-  const rows = result.components.map((c) => ({
-    Component: c.label,
-    Amount: formatCurrency(c.value),
-    Share: `${c.percentage}%`
-  }));
-  return printTable(rows, ["Component", "Amount", "Share"]);
+    if (!result || !result.components) return "No breakdown data available.";
+    
+    let table = "| Component | Amount | Share |\n|---|---|---|\n";
+    result.components.forEach(c => {
+        table += `| ${c.label} | ${formatCurrency(c.value)} | ${c.percentage}% |\n`;
+    });
+    return table;
 }
 
 /**
@@ -1022,5 +1037,6 @@ module.exports = {
   extractClientName,
   getHelpText,
   getBenchmarkResponse,
-  formatDecompositionTable
+  formatDecompositionTable,
+  formatOverdueTable
 };

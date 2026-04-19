@@ -116,11 +116,34 @@ async function executeNode(state) {
     const balance = getCashBalance();
     fallbackText = `Current net cash balance is ${formatCurrency(balance.netBalance)}.\nIncome: ${formatCurrency(balance.totalIncome)} | Expenses: ${formatCurrency(balance.totalExpenses)}`;
   } else if (intent === INTENTS.OVERDUE_INVOICES) {
+    const { formatOverdueTable } = require("./queryAgent");
+    const snapshot = getSnapshot(activeDataset);
+    
+    let invoices = snapshot.overdueList || [];
+    let contextTitle = "Global Overdue Status";
+
     if (lastClient) {
-      const invoicesByClient = getInvoicesByClient(lastClient);
-      const overdueInvoice = invoicesByClient.find((invoice) => invoice.status === "overdue");
-      fallbackText = `${lastClient} has ${invoicesByClient.length} invoices. ${overdueInvoice ? `Overdue: ${formatCurrency(overdueInvoice.amount)}.` : "No overdue invoices."}`;
+      invoices = invoices.filter(inv => inv.client.toLowerCase().includes(lastClient.toLowerCase()));
+      contextTitle = `Overdue History for ${lastClient}`;
     }
+
+    const table = formatOverdueTable(invoices);
+    const systemPrompt = buildSystemPrompt(snapshot) +
+      `\n\n### MANDATORY DATA SOURCE: OVERDUE TABLE\n` +
+      `Focus: ${contextTitle}\n` +
+      `${table}\n` +
+      `### END DATA SOURCE\n\n` +
+      `Task: Present the data above. You MUST lead with the provided markdown table. Accuracy is 100% mandatory. Ignore irrelevant snapshot data if it contradicts this specific table.`;
+
+    const llm = getLLM();
+    const resultAI = await llm.invoke([new SystemMessage(systemPrompt), ...messages]);
+
+    return {
+      response: resultAI.content.trim(),
+      duel: null,
+      trend: null,
+      comparisonTrend: null
+    };
   }
 
   const snapshot = getSnapshot(activeDataset);
@@ -155,10 +178,10 @@ async function executeNode(state) {
       `\n\n### MANDATORY DATA SOURCE: TARGET DECOMPOSITION\n` +
       `You MUST explain the following components of the focus area "${result.target}":\n` +
       `Total: ${formatCurrency(result.total)}\n` +
-      `Breakdown: ${JSON.stringify(result.components)}\n` +
+      `Tabular Breakdown:\n${table}\n` +
       `Statistically relevant patterns: ${result.insights.join(", ") || "None detected"}\n` +
       `### END DATA SOURCE\n\n` +
-      "Task: Provide a strategic executive narrative of the decomposition data above. Highlight the top contributor and explain any concentration risks or outliers found in the statistically relevant patterns. Ignore other snapshot data if it contradicts the Target Decomposition breakdown.";
+      "Task: Provide a strategic executive narrative. You MUST lead with the Tabular Breakdown provided above. Highlight the top contributor and explain any concentration risks or outliers found in the statistically relevant patterns.";
 
     const llm = getLLM();
     const resultAI = await llm.invoke([new SystemMessage(systemPrompt), ...messages]);
@@ -363,9 +386,90 @@ async function* handleStream(userInput, customDataset = null, history = []) {
     const clientFromQuery = extractClientName(userInput, customDataset);
     const resolvedClient = clientFromQuery || lastClient;
 
-    // 2. Build the system prompt
+    // 2. High-Priority Side-Effect: Send Reminder
+    if (intent === INTENTS.SEND_REMINDER) {
+      if (!resolvedClient) {
+        yield { type: 'text', content: "Please specify which client should receive the reminder." };
+        return;
+      }
+
+      const dataset = customDataset || require("../data/transactions.json");
+      const overdueRow = dataset.find(item => {
+        const clientKey = Object.keys(item).find(k => k.toLowerCase() === 'client' || k.toLowerCase() === 'customer');
+        return clientKey && item[clientKey] && item[clientKey].toLowerCase() === resolvedClient.toLowerCase() && (item.status === 'overdue' || item.amount < 0);
+      });
+
+      if (!overdueRow) {
+        yield { type: 'text', content: `No overdue records found for ${resolvedClient} in the active dataset.` };
+        return;
+      }
+
+      const result = await sendPaymentReminder({
+        client: resolvedClient,
+        amount: Math.abs(overdueRow.amount || 0),
+        daysOverdue: overdueRow.daysOverdue || 7,
+        invoiceId: overdueRow.id || overdueRow.invoiceId || 'N/A'
+      }, customDataset);
+
+      yield { 
+        type: 'text', 
+        content: result.alert,
+        intent 
+      };
+      return;
+    }
+
+    // 3. Narrative Support Intelligence (Tables, Data Injections)
+    let extraContext = "";
+    if (intent === INTENTS.OVERDUE_INVOICES) {
+      const { formatOverdueTable } = require("./queryAgent");
+      let invoices = snapshot.overdueList || [];
+      if (resolvedClient) {
+        invoices = invoices.filter(i => i.client.toLowerCase().includes(resolvedClient.toLowerCase()));
+      }
+      const table = formatOverdueTable(invoices);
+      extraContext = `\n\n### MANDATORY DATA SOURCE: OVERDUE TABLE\n${table}\nTask: You MUST lead your response with the markdown table provided above.`;
+    } else if (intent === INTENTS.DECOMPOSITION) {
+      const { decomposeTransactions } = require("../services/decompositionService");
+      const { formatDecompositionTable } = require("./queryAgent");
+      const norm = userInput.toLowerCase();
+      let decompType = (norm.includes("sales") || norm.includes("revenue") || norm.includes("income")) ? "income" : "expense";
+      let decompGroup = (norm.includes("region") || norm.includes("location") || norm.includes("area")) ? "region" : (norm.includes("channel") ? "channel" : "category");
+      const result = decomposeTransactions(decompType, null, decompGroup, customDataset);
+      const table = formatDecompositionTable(result);
+      extraContext = `\n\n### MANDATORY DATA SOURCE: BREAKDOWN\nFocus: ${result.target}\n${table}\nTask: You MUST lead your response with the markdown table provided above.`;
+    }
+
+    // NEW: Detailed Comparison Detection for Graphs
+    const normalized = userInput.toLowerCase();
+    const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "jan", "feb", "mar", "apr"];
+    const isPeriodComparison = monthNames.some(m => normalized.includes(m)) || normalized.includes("month") || normalized.includes("week");
+
+    if (intent === INTENTS.COMPARE && (normalized.includes(" vs ") || normalized.includes(" versus "))) {
+      const cleanInput = normalized
+        .replace(/.*compare /i, "")
+        .replace(/["']/g, "")
+        .replace(/\.$/, "");
+      
+      if (isPeriodComparison) {
+        const { comparePeriods } = require("../services/cashFlowService");
+        const period = normalized.includes("week") ? "week" : "month";
+        snapshot.periodComparison = comparePeriods(period, 1, customDataset);
+      } else {
+        const parts = cleanInput.split(/ vs | versus /);
+        if (parts.length >= 2) {
+          const entityA = parts[0].trim();
+          const entityB = parts[1].trim();
+          const { compareEntities } = require("../services/cashFlowService");
+          snapshot.duel = compareEntities(entityA, entityB, customDataset);
+        }
+      }
+    }
+
+    // 4. Build the system prompt for narrative intents
     const systemPrompt = buildSystemPrompt(snapshot) + 
       (resolvedClient ? `\n\nCONTEXT: You are currently discussing "${resolvedClient}".` : "") +
+      extraContext +
       `\n\nGROUNDING RULE: Answer ONLY using the snapshot data. Accuracy is 100% mandatory.`;
 
     // 3. Stream from LLM

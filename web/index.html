@@ -633,8 +633,10 @@
             doc.setFont("times", "normal");
             doc.setFontSize(11);
             doc.setLineHeightFactor(1.15);
-            const splitText = doc.splitTextToSize(cleanText, 170);
-            doc.text(splitText, 20, 75);
+            // Trim cleaned text to avoid leading newline gaps
+            const trimmedText = cleanText.trim();
+            const splitText = doc.splitTextToSize(trimmedText, 170);
+            doc.text(splitText, 20, 70); 
             
             // Page 1 Footer
             doc.setFontSize(9);
