@@ -58,6 +58,10 @@ months.forEach(m => {
     rows.push(createTxn(monthStart, 'income', northAmount, 'sales', 'Monthly wholesale distribution', 'Sigma Traders', 'North', 'Wholesale'));
   }
 
+  // NEW: CONSULTING INCOME (Diversification)
+  const consultingAmount = 45000 + (Math.random() * 10000);
+  rows.push(createTxn(addDays(monthStart, 3), 'income', consultingAmount, 'consulting', 'Quarterly supply-chain advisory', 'Sigma Traders', 'North', 'Export'));
+
   // South Region - Beta Logistics (Steady Growth 5%)
   const southAmount = 100000 * Math.pow(1.05, m);
   rows.push(createTxn(addDays(monthStart, 5), 'income', southAmount, 'sales', 'Logistics hub revenue', 'Beta Logistics', 'South', 'Wholesale'));

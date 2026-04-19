@@ -140,12 +140,14 @@ async function executeNode(state) {
       decompGroup = "client";
     }
 
-    if (norm.includes("cost") || norm.includes("expense") || norm.includes("spending")) {
-      decompType = "expense";
-      decompGroup = "category";
+    if (norm.includes("region") || norm.includes("location") || norm.includes("area")) {
+      decompGroup = "region";
+    }
+    if (norm.includes("channel") || norm.includes("medium") || norm.includes("method")) {
+      decompGroup = "channel";
     }
 
-    const result = decomposeTransactions(decompType, decompFilter, decompGroup);
+    const result = decomposeTransactions(decompType, decompFilter, decompGroup, activeDataset);
     const table = formatDecompositionTable(result);
 
     const systemPrompt =
@@ -162,7 +164,7 @@ async function executeNode(state) {
     const resultAI = await llm.invoke([new SystemMessage(systemPrompt), ...messages]);
 
     return {
-      response: `${resultAI.content.trim()}\n${table}`,
+      response: resultAI.content.trim(),
       duel: null,
       trend: null,
       comparisonTrend: null

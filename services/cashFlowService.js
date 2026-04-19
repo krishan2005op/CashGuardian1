@@ -219,6 +219,8 @@ function summarizeEntityMetrics(entity, dataset = transactions) {
   const matches = data.filter(t => 
     (t.client && t.client.toLowerCase().includes(norm)) ||
     (t.category && t.category.toLowerCase().includes(norm)) ||
+    (t.region && t.region.toLowerCase().includes(norm)) ||
+    (t.channel && t.channel.toLowerCase().includes(norm)) ||
     (t.description && t.description.toLowerCase().includes(norm))
   );
 

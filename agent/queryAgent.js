@@ -77,12 +77,16 @@ ${anomalies || "No critical anomalies detected in recent spending patterns."}
 ${validationNotes}
 =====================================
 
-=== CONTACT DIRECTORY (FOR EMAILS/REMINDERS) ===
-${JSON.stringify(snapshot.contacts || {}, null, 2)}
+=== TOP TRANSACTION DRIVERS (FOR ROOT CAUSE) ===
+${(snapshot.topDrivers || []).join('\n')}
 ================================================
 
-=== OVERDUE LIST (DETAIL) ===
-${JSON.stringify(snapshot.overdueList || [], null, 2)}
+=== CONTACT DIRECTORY (TOP 5) ===
+${JSON.stringify(Object.fromEntries(Object.entries(snapshot.contacts || {}).slice(0, 5)), null, 2)}
+================================================
+
+=== OVERDUE LIST (TOP 3) ===
+${JSON.stringify((snapshot.overdueList || []).slice(0, 3), null, 2)}
 =============================
 
 Rules:
@@ -303,6 +307,7 @@ function getSnapshot(customDataset = null) {
         amount: i.amount,
         dueDate: i.dueDate || i.date || 'N/A'
       })),
+      topDrivers: currentInterval.sort((a,b) => b.amount - a.amount).slice(0, 5).map(i => `${i.type === 'income' ? 'IN' : 'OUT'}: ${i.description} (₹${i.amount.toLocaleString()})`),
       contacts: cleanedData.reduce((acc, row) => {
         const clientKey = Object.keys(row).find(k => k.toLowerCase() === 'client' || k.toLowerCase() === 'customer');
         const emailKey = Object.keys(row).find(k => k.toLowerCase().includes('email') || k.toLowerCase() === 'contact');
@@ -794,8 +799,8 @@ async function handleQuery(userInput, customDataset = null) {
     
     const systemPrompt = buildSystemPrompt(snapshot) +
       `\n\n### MANDATORY DATA SOURCE: DRIVER & ANOMALY ANALYSIS\n` +
-      `Comparison Variances: ${JSON.stringify(comparison.variances)}\n` +
-      `Detected Anomalies: ${JSON.stringify(anomalies)}\n` +
+      `Comparison Variances: ${JSON.stringify(comparison.variances.categories.slice(0, 10))}\n` +
+      `Detected Anomalies: ${JSON.stringify(anomalies.slice(0, 5))}\n` +
       `### END DATA SOURCE\n\n` +
       `Task: Identify the drivers behind increases or decreases in performance. ` +
       `Highlight the most influential categories (e.g., product, channel, or expense type). ` +
@@ -841,7 +846,7 @@ async function handleQuery(userInput, customDataset = null) {
       `\n\n### MANDATORY DATA SOURCE: TARGET DECOMPOSITION\n` +
       `You MUST explain the following components of the focus area "${result.target}":\n` +
       `Total: ${formatCurrency(result.total)}\n` +
-      `Breakdown: ${JSON.stringify(result.components)}\n` +
+      `Breakdown: ${JSON.stringify(result.components.slice(0, 10))}\n` +
       `Statistically relevant patterns: ${result.insights.join(", ") || "None detected"}\n` +
       `### END DATA SOURCE\n\n` +
       `Task: Decompose the number into its core components. ` +
