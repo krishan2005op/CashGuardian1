@@ -1037,5 +1037,6 @@ module.exports = {
   extractClientName,
   getHelpText,
   getBenchmarkResponse,
-  formatDecompositionTable
+  formatDecompositionTable,
+  formatOverdueTable
 };

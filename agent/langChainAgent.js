@@ -116,17 +116,15 @@ async function executeNode(state) {
     const balance = getCashBalance();
     fallbackText = `Current net cash balance is ${formatCurrency(balance.netBalance)}.\nIncome: ${formatCurrency(balance.totalIncome)} | Expenses: ${formatCurrency(balance.totalExpenses)}`;
   } else if (intent === INTENTS.OVERDUE_INVOICES) {
-    const { getOverdueInvoices, getInvoicesByClient } = require("../services/invoiceService");
     const { formatOverdueTable } = require("./queryAgent");
+    const snapshot = getSnapshot(activeDataset);
     
-    let invoices = [];
+    let invoices = snapshot.overdueList || [];
     let contextTitle = "Global Overdue Status";
 
     if (lastClient) {
-      invoices = getInvoicesByClient(lastClient, activeDataset).filter(inv => inv.status === 'overdue');
+      invoices = invoices.filter(inv => inv.client.toLowerCase().includes(lastClient.toLowerCase()));
       contextTitle = `Overdue History for ${lastClient}`;
-    } else {
-      invoices = getOverdueInvoices(activeDataset);
     }
 
     const table = formatOverdueTable(invoices);
@@ -424,9 +422,11 @@ async function* handleStream(userInput, customDataset = null, history = []) {
     // 3. Narrative Support Intelligence (Tables, Data Injections)
     let extraContext = "";
     if (intent === INTENTS.OVERDUE_INVOICES) {
-      const { getOverdueInvoices, getInvoicesByClient } = require("../services/invoiceService");
       const { formatOverdueTable } = require("./queryAgent");
-      let invoices = resolvedClient ? getInvoicesByClient(resolvedClient, customDataset).filter(i => i.status === 'overdue') : getOverdueInvoices(customDataset);
+      let invoices = snapshot.overdueList || [];
+      if (resolvedClient) {
+        invoices = invoices.filter(i => i.client.toLowerCase().includes(resolvedClient.toLowerCase()));
+      }
       const table = formatOverdueTable(invoices);
       extraContext = `\n\n### MANDATORY DATA SOURCE: OVERDUE TABLE\n${table}\nTask: You MUST lead your response with the markdown table provided above.`;
     } else if (intent === INTENTS.DECOMPOSITION) {
