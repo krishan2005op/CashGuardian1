@@ -644,11 +644,7 @@ async function handleQuery(userInput, customDataset = null) {
   }
 
   // For other intents with a custom dataset, use AI reasoning with the data context
-  if (customDataset) {
-    const snapshot = getSnapshot(customDataset);
-    const systemPrompt = buildSystemPrompt(snapshot) + `\n\nAdditionally, here is a sampling of the custom dataset rows:\n${JSON.stringify(customDataset.slice(0, 10))}`;
-    return callAI(systemPrompt, userInput);
-  }
+
 
   if (intent === INTENTS.HELP) {
     return getHelpText();
@@ -846,13 +842,31 @@ async function handleQuery(userInput, customDataset = null) {
       comparison = comparePeriods(period, 1, customDataset);
     }
 
-    const response = await maybeUseAI(userInput, formatComparison(comparison), customDataset);
+    const snapshot = getSnapshot(customDataset);
+    const systemPrompt = buildSystemPrompt(snapshot) +
+      `\n\n### MANDATORY DATA SOURCE: PERIOD COMPARISON\n` +
+      `Target Period (${comparison.current.period}): Income ${formatCurrency(comparison.current.income)}, Expenses ${formatCurrency(comparison.current.expenses)}\n` +
+      `Baseline Period (${comparison.previous.period}): Income ${formatCurrency(comparison.previous.income)}, Expenses ${formatCurrency(comparison.previous.expenses)}\n` +
+      `Deltas: Income ${formatCurrency(comparison.deltas.income)}, Expenses ${formatCurrency(comparison.deltas.expenses)}, Net ${formatCurrency(comparison.deltas.net)}\n` +
+      `Summary: ${comparison.narrative}\n` +
+      `### END DATA SOURCE\n\n` +
+      `Task: Compare the two periods above based ONLY on the data provided in the MANDATORY DATA SOURCE. ` +
+      `Be specific with numbers. Highlight which period was more profitable and mention the percentage changes if available.`;
+
+    const response = await callAI(systemPrompt, userInput, formatComparison(comparison));
     
     return {
       content: response,
       trend: comparison.currentTrend,
       comparisonTrend: comparison.previousTrend
     };
+  }
+
+  // CATCH-ALL FOR CUSTOM DATASETS: If no specific intent matched, use generic AI reasoning
+  if (customDataset) {
+    const snapshot = getSnapshot(customDataset);
+    const systemPrompt = buildSystemPrompt(snapshot) + `\n\nAdditionally, here is a sampling of the custom dataset rows:\n${JSON.stringify(customDataset.slice(0, 10))}`;
+    return callAI(systemPrompt, userInput);
   }
 
   if (intent === INTENTS.PREDICTION) {

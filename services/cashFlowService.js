@@ -47,10 +47,10 @@ function getTransactionsInRange(from, to, dataset = transactions) {
 function summarizeTransactions(items) {
   const income = items
     .filter((transaction) => transaction.type === "income")
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    .reduce((sum, transaction) => sum + safeNumber(transaction.amount), 0);
   const expenses = items
     .filter((transaction) => transaction.type === "expense")
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    .reduce((sum, transaction) => sum + Math.abs(safeNumber(transaction.amount)), 0);
 
   return {
     income,
@@ -201,7 +201,7 @@ function getCategoryVariances(current, previous) {
 
 function summarizeByCategory(items) {
   return items.reduce((acc, t) => {
-    acc[t.category] = (acc[t.category] || 0) + Number(t.amount);
+    acc[t.category] = (acc[t.category] || 0) + safeNumber(t.amount);
     return acc;
   }, {});
 }
@@ -365,7 +365,9 @@ function calculateWeeklyTrend(transactions, weekOffset = 0, anchorDate = null, n
   // Calculate dynamic history length (capped at 13 weeks, floored at 4 for stability)
   const diffMs = absoluteLatest.getTime() - earliestInData.getTime();
   const calculatedWeeks = Math.ceil(diffMs / weekMs);
-  const loopCount = Math.max(4, Math.min(calculatedWeeks + 1, 13));
+  
+  // FORCE ALIGNMENT: If comparing, use a fixed 13-week window so both periods match
+  const loopCount = normalizeLabels ? 12 : Math.max(4, Math.min(calculatedWeeks + 1, 13));
 
   const trend = { labels: [], revenue: [], expenses: [] };
 
