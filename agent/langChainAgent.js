@@ -116,11 +116,36 @@ async function executeNode(state) {
     const balance = getCashBalance();
     fallbackText = `Current net cash balance is ${formatCurrency(balance.netBalance)}.\nIncome: ${formatCurrency(balance.totalIncome)} | Expenses: ${formatCurrency(balance.totalExpenses)}`;
   } else if (intent === INTENTS.OVERDUE_INVOICES) {
+    const { getOverdueInvoices, getInvoicesByClient } = require("../services/invoiceService");
+    const { formatOverdueTable } = require("./queryAgent");
+    
+    let invoices = [];
+    let contextTitle = "Global Overdue Status";
+
     if (lastClient) {
-      const invoicesByClient = getInvoicesByClient(lastClient);
-      const overdueInvoice = invoicesByClient.find((invoice) => invoice.status === "overdue");
-      fallbackText = `${lastClient} has ${invoicesByClient.length} invoices. ${overdueInvoice ? `Overdue: ${formatCurrency(overdueInvoice.amount)}.` : "No overdue invoices."}`;
+      invoices = getInvoicesByClient(lastClient, activeDataset).filter(inv => inv.status === 'overdue');
+      contextTitle = `Overdue History for ${lastClient}`;
+    } else {
+      invoices = getOverdueInvoices(activeDataset);
     }
+
+    const table = formatOverdueTable(invoices);
+    const systemPrompt = buildSystemPrompt(snapshot) +
+      `\n\n### MANDATORY DATA SOURCE: OVERDUE TABLE\n` +
+      `Focus: ${contextTitle}\n` +
+      `${table}\n` +
+      `### END DATA SOURCE\n\n` +
+      `Task: Present the data above. You MUST lead with the provided markdown table. Accuracy is 100% mandatory. Ignore irrelevant snapshot data if it contradicts this specific table.`;
+
+    const llm = getLLM();
+    const resultAI = await llm.invoke([new SystemMessage(systemPrompt), ...messages]);
+
+    return {
+      response: resultAI.content.trim(),
+      duel: null,
+      trend: null,
+      comparisonTrend: null
+    };
   }
 
   const snapshot = getSnapshot(activeDataset);
@@ -155,10 +180,10 @@ async function executeNode(state) {
       `\n\n### MANDATORY DATA SOURCE: TARGET DECOMPOSITION\n` +
       `You MUST explain the following components of the focus area "${result.target}":\n` +
       `Total: ${formatCurrency(result.total)}\n` +
-      `Breakdown: ${JSON.stringify(result.components)}\n` +
+      `Tabular Breakdown:\n${table}\n` +
       `Statistically relevant patterns: ${result.insights.join(", ") || "None detected"}\n` +
       `### END DATA SOURCE\n\n` +
-      "Task: Provide a strategic executive narrative of the decomposition data above. Highlight the top contributor and explain any concentration risks or outliers found in the statistically relevant patterns. Ignore other snapshot data if it contradicts the Target Decomposition breakdown.";
+      "Task: Provide a strategic executive narrative. You MUST lead with the Tabular Breakdown provided above. Highlight the top contributor and explain any concentration risks or outliers found in the statistically relevant patterns.";
 
     const llm = getLLM();
     const resultAI = await llm.invoke([new SystemMessage(systemPrompt), ...messages]);
@@ -396,9 +421,29 @@ async function* handleStream(userInput, customDataset = null, history = []) {
       return;
     }
 
-    // 3. Build the system prompt for narrative intents
+    // 3. Narrative Support Intelligence (Tables, Data Injections)
+    let extraContext = "";
+    if (intent === INTENTS.OVERDUE_INVOICES) {
+      const { getOverdueInvoices, getInvoicesByClient } = require("../services/invoiceService");
+      const { formatOverdueTable } = require("./queryAgent");
+      let invoices = resolvedClient ? getInvoicesByClient(resolvedClient, customDataset).filter(i => i.status === 'overdue') : getOverdueInvoices(customDataset);
+      const table = formatOverdueTable(invoices);
+      extraContext = `\n\n### MANDATORY DATA SOURCE: OVERDUE TABLE\n${table}\nTask: You MUST lead your response with the markdown table provided above.`;
+    } else if (intent === INTENTS.DECOMPOSITION) {
+      const { decomposeTransactions } = require("../services/decompositionService");
+      const { formatDecompositionTable } = require("./queryAgent");
+      const norm = userInput.toLowerCase();
+      let decompType = (norm.includes("sales") || norm.includes("revenue") || norm.includes("income")) ? "income" : "expense";
+      let decompGroup = (norm.includes("region") || norm.includes("location") || norm.includes("area")) ? "region" : (norm.includes("channel") ? "channel" : "category");
+      const result = decomposeTransactions(decompType, null, decompGroup, customDataset);
+      const table = formatDecompositionTable(result);
+      extraContext = `\n\n### MANDATORY DATA SOURCE: BREAKDOWN\nFocus: ${result.target}\n${table}\nTask: You MUST lead your response with the markdown table provided above.`;
+    }
+
+    // 4. Build the system prompt for narrative intents
     const systemPrompt = buildSystemPrompt(snapshot) + 
       (resolvedClient ? `\n\nCONTEXT: You are currently discussing "${resolvedClient}".` : "") +
+      extraContext +
       `\n\nGROUNDING RULE: Answer ONLY using the snapshot data. Accuracy is 100% mandatory.`;
 
     // 3. Stream from LLM
