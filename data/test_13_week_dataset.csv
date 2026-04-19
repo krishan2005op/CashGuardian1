@@ -268,3 +268,9 @@ date,type,amount,category,description,client,status,dueDate,issueDate,email
 2026-04-19,income,7615,sales,Daily Retail Settlement,Gamma Services,paid,2026-04-19,2026-04-19,krishanmalhotra2005@gmail.com
 2026-04-19,income,11643,sales,Daily Retail Settlement,Gamma Services,paid,2026-04-19,2026-04-19,krishanmalhotra2005@gmail.com
 2026-04-19,expense,2563,utilities,Daily Operational Expense,,paid,2026-04-19,2026-04-19,
+2026-04-20,income,15000,sales,Bulk Order Settlement,Alpha Retail,paid,2026-04-20,2026-04-20,nandan.nv358@gmail.com
+2026-04-21,expense,35000,logistics,Express Logistics Surcharge,,paid,2026-04-21,2026-04-21,
+2026-04-22,income,9200,sales,Daily Retail Settlement,Beta Logistics,paid,2026-04-22,2026-04-22,krishanmalhotra2005@gmail.com
+2026-04-25,expense,45000,rent,Warehouse Rent April,,paid,2026-04-25,2026-04-25,
+2026-04-28,income,12000,sales,Daily Retail Settlement,Sigma Traders,paid,2026-04-28,2026-04-28,nandan.nv358@gmail.com
+2026-04-30,expense,120000,salaries,Staff Payroll April,,paid,2026-04-30,2026-04-30,

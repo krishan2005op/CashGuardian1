@@ -811,8 +811,41 @@ async function handleQuery(userInput, customDataset = null) {
     }
 
     // PERIOD COMPARISON (e.g. "April vs March" or "this month vs last month")
-    const period = normalized.includes("week") ? "week" : "month";
-    const comparison = comparePeriods(period, 1, customDataset);
+    const monthMap = {
+      january: 0, feb: 1, february: 1, mar: 2, march: 2, apr: 3, april: 3, 
+      may: 4, june: 5, july: 6, august: 7, september: 8, october: 9, november: 10, december: 11, jan: 0
+    };
+
+    const getMonthRange = (name) => {
+      const clean = name.toLowerCase().replace(/.*compare /i, "").trim();
+      const idx = monthMap[clean];
+      if (idx === undefined) return null;
+      return {
+        start: new Date(Date.UTC(2026, idx, 1)),
+        end: new Date(Date.UTC(2026, idx + 1, 0, 23, 59, 59))
+      };
+    };
+
+    let comparison;
+    if (normalized.includes(" vs ") || normalized.includes(" versus ")) {
+      const parts = normalized.split(/ vs | versus /);
+      const rangeA = getMonthRange(parts[0]);
+      const rangeB = getMonthRange(parts[1]);
+
+      if (rangeA && rangeB) {
+        comparison = comparePeriods({
+          target: rangeA,
+          baseline: rangeB,
+          name: `${parts[0].replace(/.*compare /i, "").trim()} vs ${parts[1].trim()}`
+        }, 1, customDataset);
+      }
+    }
+
+    if (!comparison) {
+      const period = normalized.includes("week") ? "week" : "month";
+      comparison = comparePeriods(period, 1, customDataset);
+    }
+
     const response = await maybeUseAI(userInput, formatComparison(comparison), customDataset);
     
     return {
