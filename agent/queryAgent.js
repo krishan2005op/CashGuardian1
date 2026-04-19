@@ -61,6 +61,8 @@ Total Expenses (90d):  ₹${snapshot.totalExpenses.toLocaleString("en-IN")}
 Overdue Invoices:      ${snapshot.overdueCount} invoices worth ₹${snapshot.overdueTotal.toLocaleString("en-IN")}
 High-Risk Clients:     ${snapshot.highRiskClients.join(", ")}
 Top Expense Category:  ${snapshot.topExpenseCategory}
+Operational Regions:   ${snapshot.regions || 'All'}
+Active Channels:       ${snapshot.channels || 'N/A'}
 ===========================
 
 === PERIOD-ON-PERIOD PERFORMANCE (Last 30d vs Prior 30d) ===
@@ -199,7 +201,9 @@ function getSnapshot(customDataset = null) {
     const cleanedData = customDataset.map(item => ({
       ...item,
       amount: safeNumber(item.amount),
-      date: item.date // Keep as string; services expect ISO strings
+      date: item.date,
+      region: String(item.region || 'All').trim(),
+      channel: String(item.channel || 'Misc').trim()
     }));
 
     const totalIncome = cleanedData
@@ -283,6 +287,8 @@ function getSnapshot(customDataset = null) {
       overdueTotal: overdueDeduplicated.reduce((sum, item) => sum + item.amount, 0),
       highRiskClients: highRiskClients.length > 0 ? highRiskClients : ['None'],
       topExpenseCategory: breakdown.length > 0 ? breakdown.sort((a, b) => b.total - a.total)[0].category : 'Various',
+      regions: [...new Set(cleanedData.map(d => d.region))].join(', '),
+      channels: [...new Set(cleanedData.map(d => d.channel))].join(', '),
       externalValidationNotes: [
         'Custom dataset active. Analysis based on user-provided transactional boundaries.',
         ...activeAnomalies.map(a => `ANOMALY DETECTED: ${a.explanation}`)
@@ -813,6 +819,14 @@ async function handleQuery(userInput, customDataset = null) {
     if (norm.includes("cost") || norm.includes("expense") || norm.includes("spending")) {
       type = "expense";
       group = "category";
+    }
+
+    // Dynamic grouping override
+    if (norm.includes("region") || norm.includes("location") || norm.includes("area")) {
+      group = "region";
+    }
+    if (norm.includes("channel") || norm.includes("medium") || norm.includes("method")) {
+      group = "channel";
     }
 
     const result = decomposeTransactions(type, filter, group, activeDataset);
