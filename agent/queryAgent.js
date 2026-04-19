@@ -620,6 +620,17 @@ async function maybeUseAI(userInput, fallbackText, customDataset = null) {
  * @returns {Promise<string>} Routed response.
  */
 async function handleQuery(userInput, customDataset = null) {
+  // PRE-CLEAN: Ensure custom dataset is sanitized for all services
+  const activeDataset = (customDataset && customDataset.length > 0) 
+    ? customDataset.map(item => ({
+        ...item,
+        amount: safeNumber(item.amount),
+        type: String(item.type || '').trim().toLowerCase(),
+        category: String(item.category || '').trim().toLowerCase(),
+        client: String(item.client || '').trim()
+      }))
+    : null;
+
   const intent = classifyIntent(userInput);
 
   // If sending a reminder, we should ALWAYS trigger the actual service
@@ -628,7 +639,7 @@ async function handleQuery(userInput, customDataset = null) {
     if (!clientName) return "Please specify which client should receive the reminder.";
 
     // Find the invoice in the current dataset (custom or demo)
-    const dataset = customDataset || require("../data/transactions.json");
+    const dataset = activeDataset || require("../data/transactions.json");
     const overdueRow = dataset.find(item => item.client === clientName && (item.status === 'overdue' || item.amount < 0));
 
     if (!overdueRow) return `No overdue records found for ${clientName} in the active dataset.`;
@@ -638,40 +649,39 @@ async function handleQuery(userInput, customDataset = null) {
       amount: Math.abs(overdueRow.amount),
       daysOverdue: overdueRow.daysOverdue || 7,
       invoiceId: overdueRow.id || overdueRow.invoiceId || 'N/A'
-    }, customDataset);
+    }, activeDataset);
 
     return result.alert;
   }
 
   // For other intents with a custom dataset, use AI reasoning with the data context
 
-
   if (intent === INTENTS.HELP) {
     return getHelpText();
   }
 
   if (intent === INTENTS.CASH_BALANCE) {
-    const balance = getCashBalance(customDataset);
+    const balance = getCashBalance(activeDataset);
     return maybeUseAI(
       userInput,
       `Current net cash balance is ${formatCurrency(balance.netBalance)}.\nIncome: ${formatCurrency(balance.totalIncome)} | Expenses: ${formatCurrency(balance.totalExpenses)}`,
-      customDataset
+      activeDataset
     );
   }
 
   if (intent === INTENTS.CASH_SUMMARY) {
-    const summary = getCashSummary(90, customDataset);
+    const summary = getCashSummary(90, activeDataset);
     return maybeUseAI(
       userInput,
       `Over the latest tracked period, income was ${formatCurrency(summary.income)} and expenses were ${formatCurrency(summary.expenses)}.\nNet cash flow was ${formatCurrency(summary.net)}, with ${summary.topExpenseCategory} as the top expense category.`,
-      customDataset
+      activeDataset
     );
   }
 
   if (intent === INTENTS.OVERDUE_INVOICES) {
-    const clientName = extractClientName(userInput, customDataset);
+    const clientName = extractClientName(userInput, activeDataset);
     if (clientName) {
-      const invoicesByClient = getInvoicesByClient(clientName, customDataset);
+      const invoicesByClient = getInvoicesByClient(clientName, activeDataset);
       const overdueInvoice = invoicesByClient.find((invoice) => invoice.status === "overdue");
       const paidInvoices = invoicesByClient.filter(i => i.status === 'paid');
       const latePaidCount = invoicesByClient.filter((invoice) => 
@@ -684,7 +694,7 @@ async function handleQuery(userInput, customDataset = null) {
                `${latePaidCount} previously paid invoices were late.`;
       }
 
-      const snapshot = getSnapshot(customDataset);
+      const snapshot = getSnapshot(activeDataset);
       const fallback = `${clientName} has ${invoicesByClient.length} invoices on record. ` +
                `${overdueInvoice ? `Current overdue: ${formatCurrency(overdueInvoice.amount)}.` : "No current overdue."} ` +
                `${latePaidCount} previously paid invoices were late.`;
@@ -702,31 +712,44 @@ async function handleQuery(userInput, customDataset = null) {
 
       return callAI(systemPrompt, userInput, fallback);
     }
-    return maybeUseAI(userInput, formatOverdueInvoices(getOverdueInvoices(customDataset)), customDataset);
+    return maybeUseAI(userInput, formatOverdueInvoices(getOverdueInvoices(activeDataset)), activeDataset);
   }
 
   if (intent === INTENTS.RISK_CLIENTS) {
-    const clientName = extractClientName(userInput, customDataset);
+    const clientName = extractClientName(userInput, activeDataset);
     if (clientName) {
-      const risk = getClientRisk(clientName, customDataset);
+      const risk = getClientRisk(clientName, activeDataset);
       if (!risk) {
         return `No risk history found for ${clientName}.`;
       }
       return maybeUseAI(
         userInput,
         `${risk.client} is ${risk.riskLevel} risk with score ${risk.riskScore} and ${formatCurrency(risk.overdueAmount)} currently overdue. ${risk.recommendation}.`,
-        customDataset
+        activeDataset
       );
     }
-    return maybeUseAI(userInput, formatRiskReport(getRiskReport(customDataset)), customDataset);
+    return maybeUseAI(userInput, formatRiskReport(getRiskReport(activeDataset)), activeDataset);
   }
 
   if (intent === INTENTS.EXPENSE_BREAKDOWN) {
-    return maybeUseAI(userInput, formatExpenseBreakdown(getExpenseBreakdown(customDataset)), customDataset);
+    return maybeUseAI(userInput, formatExpenseBreakdown(getExpenseBreakdown(activeDataset)), activeDataset);
   }
 
   if (intent === INTENTS.ANOMALY) {
-    return maybeUseAI(userInput, formatAnomalies(detectAnomalies(customDataset)), customDataset);
+    const anomalies = detectAnomalies(activeDataset);
+    const comparison = comparePeriods("month", 1, activeDataset);
+    const snapshot = getSnapshot(activeDataset);
+    
+    const systemPrompt = buildSystemPrompt(snapshot) +
+      `\n\n### MANDATORY DATA SOURCE: DRIVER & ANOMALY ANALYSIS\n` +
+      `Comparison Variances: ${JSON.stringify(comparison.variances)}\n` +
+      `Detected Anomalies: ${JSON.stringify(anomalies)}\n` +
+      `### END DATA SOURCE\n\n` +
+      `Task: Identify the drivers behind increases or decreases in performance. ` +
+      `Highlight the most influential categories (e.g., product, channel, or expense type). ` +
+      `Provide clear, concise explanations in everyday language. Reference the specific data sources.`;
+
+    return callAI(systemPrompt, userInput, formatAnomalies(anomalies));
   }
 
   if (intent === INTENTS.DECOMPOSITION) {
@@ -746,14 +769,14 @@ async function handleQuery(userInput, customDataset = null) {
       group = "category";
     }
 
-    const result = decomposeTransactions(type, filter, group, customDataset);
+    const result = decomposeTransactions(type, filter, group, activeDataset);
     const table = formatDecompositionTable(result);
 
     if (!hasAiCredentials()) {
       return `🔴 AI_API_KEY not set. Add it to .env (see AI_PROVIDER_SETUP.md)\n\n${table}`;
     }
 
-    const snapshot = getSnapshot(customDataset);
+    const snapshot = getSnapshot(activeDataset);
     const systemPrompt = buildSystemPrompt(snapshot) +
       `\n\n### MANDATORY DATA SOURCE: TARGET DECOMPOSITION\n` +
       `You MUST explain the following components of the focus area "${result.target}":\n` +
@@ -761,23 +784,25 @@ async function handleQuery(userInput, customDataset = null) {
       `Breakdown: ${JSON.stringify(result.components)}\n` +
       `Statistically relevant patterns: ${result.insights.join(", ") || "None detected"}\n` +
       `### END DATA SOURCE\n\n` +
-      "Task: Provide a strategic executive narrative of the decomposition data above. Highlight the top contributor and explain any concentration risks or outliers found in the statistically relevant patterns. Ignore other snapshot data if it contradicts the Target Decomposition breakdown.";
+      `Task: Decompose the number into its core components. ` +
+      `Surface patterns like concentration (is one client 40% of the total?) or outliers. ` +
+      `Provide both a structured narrative and refer to the table below. Be leadership-ready.`;
 
     const summary = await callAI(systemPrompt, userInput);
     return `${summary}\n${table}`;
   }
 
   if (intent === INTENTS.WEEKLY_SUMMARY) {
-    const ruleBased = await generateSummary("weekly", customDataset);
+    const ruleBased = await generateSummary("weekly", activeDataset);
     if (!hasAiCredentials()) return ruleBased;
 
-    const snapshot = getSnapshot(customDataset);
+    const snapshot = getSnapshot(activeDataset);
     const systemPrompt = buildSystemPrompt(snapshot) +
       `\n\n### MANDATORY DATA SOURCE: WEEKLY SUMMARY DATA\n` +
       `${ruleBased}\n\n` +
-      `Task: Convert the raw data points above into a professional, cohesive executive summary. ` +
-      `Highlight the top revenue source, most critical collection risk, and one actionable recommendation for the coming week. ` +
-      `Include counts and amounts explicitly.`;
+      `Task: Scan the dataset for trends, anomalies, and important shifts for the latest week. ` +
+      `Produce a concise update for leadership. Avoid noise—focus on what truly matters. ` +
+      `Provide specific source references for your claims.`;
 
     return callAI(systemPrompt, userInput, ruleBased);
   }
@@ -797,9 +822,9 @@ async function handleQuery(userInput, customDataset = null) {
         // ENTITY DUEL (e.g. "Alpha Retail vs Beta Logistics")
         const entityA = parts[0].trim();
         const entityB = parts[1].trim();
-        const duelData = compareEntities(entityA, entityB, customDataset);
+        const duelData = compareEntities(entityA, entityB, activeDataset);
 
-        const snapshot = getSnapshot(customDataset);
+        const snapshot = getSnapshot(activeDataset);
         snapshot.duel = duelData;
         const response = await callAI(buildSystemPrompt(snapshot), userInput);
         return { content: response, duel: duelData };
@@ -833,16 +858,16 @@ async function handleQuery(userInput, customDataset = null) {
           target: rangeA,
           baseline: rangeB,
           name: `${parts[0].replace(/.*compare /i, "").trim()} vs ${parts[1].trim()}`
-        }, 1, customDataset);
+        }, 1, activeDataset);
       }
     }
 
     if (!comparison) {
       const period = normalized.includes("week") ? "week" : "month";
-      comparison = comparePeriods(period, 1, customDataset);
+      comparison = comparePeriods(period, 1, activeDataset);
     }
 
-    const snapshot = getSnapshot(customDataset);
+    const snapshot = getSnapshot(activeDataset);
     const systemPrompt = buildSystemPrompt(snapshot) +
       `\n\n### MANDATORY DATA SOURCE: PERIOD COMPARISON\n` +
       `Target Period (${comparison.current.period}): Income ${formatCurrency(comparison.current.income)}, Expenses ${formatCurrency(comparison.current.expenses)}\n` +
@@ -850,8 +875,10 @@ async function handleQuery(userInput, customDataset = null) {
       `Deltas: Income ${formatCurrency(comparison.deltas.income)}, Expenses ${formatCurrency(comparison.deltas.expenses)}, Net ${formatCurrency(comparison.deltas.net)}\n` +
       `Summary: ${comparison.narrative}\n` +
       `### END DATA SOURCE\n\n` +
-      `Task: Compare the two periods above based ONLY on the data provided in the MANDATORY DATA SOURCE. ` +
-      `Be specific with numbers. Highlight which period was more profitable and mention the percentage changes if available.`;
+      `Task: Generate a high-impact comparison (visual + text). ` +
+      `Identify statistically relevant differences. ` +
+      `Use phrases like "Product A grown by X%, outperforming Y" or "Revenue decreased due to Z". ` +
+      `Disambiguate the periods explicitly.`;
 
     const response = await callAI(systemPrompt, userInput, formatComparison(comparison));
     
@@ -863,15 +890,15 @@ async function handleQuery(userInput, customDataset = null) {
   }
 
   // CATCH-ALL FOR CUSTOM DATASETS: If no specific intent matched, use generic AI reasoning
-  if (customDataset) {
-    const snapshot = getSnapshot(customDataset);
-    const systemPrompt = buildSystemPrompt(snapshot) + `\n\nAdditionally, here is a sampling of the custom dataset rows:\n${JSON.stringify(customDataset.slice(0, 10))}`;
+  if (activeDataset) {
+    const snapshot = getSnapshot(activeDataset);
+    const systemPrompt = buildSystemPrompt(snapshot) + `\n\nAdditionally, here is a sampling of the custom dataset rows:\n${JSON.stringify(activeDataset.slice(0, 10))}`;
     return callAI(systemPrompt, userInput);
   }
 
   if (intent === INTENTS.PREDICTION) {
-    const forecast = calculate30DayForecast(customDataset);
-    const snapshot = getSnapshot(customDataset);
+    const forecast = calculate30DayForecast(activeDataset);
+    const snapshot = getSnapshot(activeDataset);
     const systemPrompt = buildSystemPrompt(snapshot) +
       `\n\n### MANDATORY DATA SOURCE: 30-DAY FORECAST\n` +
       `Match the user's focus on the next 30 days using these components:\n` +
@@ -890,7 +917,7 @@ async function handleQuery(userInput, customDataset = null) {
   }
 
   return hasAiCredentials()
-    ? callAI(buildSystemPrompt(getSnapshot(customDataset)), userInput)
+    ? callAI(buildSystemPrompt(getSnapshot(activeDataset)), userInput)
     : "🔴 AI_API_KEY not set. Add it to .env (see AI_PROVIDER_SETUP.md)";
 }
 

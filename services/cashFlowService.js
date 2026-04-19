@@ -16,12 +16,11 @@ function parseUtcDate(dateStr) {
  * @returns {Date} Latest transaction date.
  */
 function getLatestTransactionDate(dataset = transactions) {
-  const data = dataset || transactions;
-  if (!data || data.length === 0) return new Date();
-  return data.reduce((latest, transaction) => {
-    const transactionDate = parseUtcDate(transaction.date);
-    return transactionDate > latest ? transactionDate : latest;
-  }, parseUtcDate(dataset[0].date));
+  const { safeDate } = require("../utils/formatter");
+  const data = dataset && dataset.length > 0 ? dataset : transactions;
+  if (!data || !data.length) return new Date();
+  const dates = data.map((t) => safeDate(t.date)).filter((d) => !isNaN(d.getTime()));
+  return dates.length ? new Date(Math.max(...dates)) : new Date();
 }
 
 /**
@@ -395,6 +394,34 @@ function calculateWeeklyTrend(transactions, weekOffset = 0, anchorDate = null, n
   }
 
   return trend;
+}
+
+/**
+ * Builds a leadership-ready narrative for period comparisons.
+ * @param {object} current - Current period summary.
+ * @param {object} previous - Previous period summary.
+ * @param {object} deltas - Calculated changes.
+ * @param {string} period - Name of the period (e.g., 'March vs February').
+ * @returns {string} Human-readable narrative.
+ */
+function buildComparisonNarrative(current, previous, deltas, period) {
+  const { formatCurrency } = require("../utils/formatter");
+  const incomeChangePct = previous.income !== 0 ? Math.round((deltas.income / previous.income) * 100) : 0;
+  const expenseChangePct = previous.expenses !== 0 ? Math.round((deltas.expenses / previous.expenses) * 100) : 0;
+  
+  const status = deltas.net >= 0 ? "improved" : "worsened";
+  const incomeDir = deltas.income >= 0 ? "increased" : "decreased";
+  const expenseDir = deltas.expenses >= 0 ? "rise" : "drop";
+  
+  let narrative = `${period.charAt(0).toUpperCase() + period.slice(1)}: Revenue ${incomeDir} by ${Math.abs(incomeChangePct)}%. `;
+  
+  if (Math.abs(deltas.expenses) > Math.abs(deltas.income) && deltas.expenses > 0) {
+    narrative += `The biggest driver was a ${Math.abs(expenseChangePct)}% ${expenseDir} in spending. `;
+  }
+  
+  narrative += `Net position has ${status} by ${formatCurrency(Math.abs(deltas.net))}.`;
+  
+  return narrative;
 }
 
 module.exports = {
