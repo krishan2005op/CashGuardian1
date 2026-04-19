@@ -440,6 +440,32 @@ async function* handleStream(userInput, customDataset = null, history = []) {
       extraContext = `\n\n### MANDATORY DATA SOURCE: BREAKDOWN\nFocus: ${result.target}\n${table}\nTask: You MUST lead your response with the markdown table provided above.`;
     }
 
+    // NEW: Detailed Comparison Detection for Graphs
+    const normalized = userInput.toLowerCase();
+    const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "jan", "feb", "mar", "apr"];
+    const isPeriodComparison = monthNames.some(m => normalized.includes(m)) || normalized.includes("month") || normalized.includes("week");
+
+    if (intent === INTENTS.COMPARE && (normalized.includes(" vs ") || normalized.includes(" versus "))) {
+      const cleanInput = normalized
+        .replace(/.*compare /i, "")
+        .replace(/["']/g, "")
+        .replace(/\.$/, "");
+      
+      if (isPeriodComparison) {
+        const { comparePeriods } = require("../services/cashFlowService");
+        const period = normalized.includes("week") ? "week" : "month";
+        snapshot.periodComparison = comparePeriods(period, 1, customDataset);
+      } else {
+        const parts = cleanInput.split(/ vs | versus /);
+        if (parts.length >= 2) {
+          const entityA = parts[0].trim();
+          const entityB = parts[1].trim();
+          const { compareEntities } = require("../services/cashFlowService");
+          snapshot.duel = compareEntities(entityA, entityB, customDataset);
+        }
+      }
+    }
+
     // 4. Build the system prompt for narrative intents
     const systemPrompt = buildSystemPrompt(snapshot) + 
       (resolvedClient ? `\n\nCONTEXT: You are currently discussing "${resolvedClient}".` : "") +
